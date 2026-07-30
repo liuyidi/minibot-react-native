@@ -1,5 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { ArrowUp, Square } from "lucide-react-native";
+import { AppIcon } from "@/components/ui/AppIcon";
 import { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
@@ -11,7 +12,8 @@ import {
   type KeyboardEvent,
 } from "react-native";
 
-import { Colors, type ThemeColors } from "@/constants/Colors";
+import { useLanguage } from "@/context/LanguageContext";
+import { type ThemePalette } from "@/lib/theme/types";
 
 /** 悬浮输入条最小高度 */
 export const FLOATING_COMPOSER_HEIGHT = 56;
@@ -76,10 +78,13 @@ type FloatingChatComposerProps = {
   text: string;
   onChangeText: (text: string) => void;
   onSend: () => void;
-  theme: ThemeColors;
+  theme: ThemePalette;
   colorScheme: "light" | "dark";
   maxLength?: number;
   disabled?: boolean;
+  /** When streaming, show stop instead of send. */
+  isStreaming?: boolean;
+  onAbort?: () => void;
 };
 
 export function FloatingChatComposer({
@@ -90,12 +95,15 @@ export function FloatingChatComposer({
   colorScheme,
   maxLength = 1000,
   disabled = false,
+  isStreaming = false,
+  onAbort,
 }: FloatingChatComposerProps) {
+  const { t } = useLanguage();
   const tabBarHeight = useBottomTabBarHeight();
   const keyboardHeight = useKeyboardHeight();
   const [inputContentHeight, setInputContentHeight] = useState(22);
-  const hasText = Boolean(text.trim()) && !disabled;
-  const composerBorder = colorScheme === "dark" ? "#48484A" : "#E4E4E7";
+  const hasText = Boolean(text.trim()) && !disabled && !isStreaming;
+  const composerBorder = theme.composerBorder;
   const isSingleLineInput = inputContentHeight <= 24;
 
   useEffect(() => {
@@ -128,11 +136,13 @@ export function FloatingChatComposer({
         <TextInput
           value={text}
           onChangeText={onChangeText}
-          editable={!disabled}
-          placeholder={disabled ? "DeepSeek 正在回复…" : "给 DeepSeek 发送消息"}
+          editable={!disabled && !isStreaming}
+          placeholder={
+            isStreaming ? t("chat.streamingPlaceholder") : t("chat.placeholder")
+          }
           placeholderTextColor={theme.textSecondary}
           keyboardAppearance={colorScheme === "dark" ? "dark" : "light"}
-          selectionColor={Colors.primary}
+          selectionColor={theme.primary}
           multiline
           maxLength={maxLength}
           scrollEnabled={!isSingleLineInput}
@@ -147,24 +157,39 @@ export function FloatingChatComposer({
           ]}
         />
         <View style={styles.sendContainer}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="发送"
-            accessibilityState={{ disabled: !hasText }}
-            disabled={!hasText}
-            onPress={handleSend}
-            style={({ pressed }) => [
-              styles.sendButton,
-              { backgroundColor: hasText ? Colors.primary : composerBorder },
-              pressed && hasText ? styles.sendButtonPressed : undefined,
-            ]}
-          >
-            <Ionicons
-              name="arrow-up"
-              size={20}
-              color={hasText ? "#FFFFFF" : theme.textSecondary}
-            />
-          </Pressable>
+          {isStreaming && onAbort ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t("chat.stopGeneration")}
+              onPress={onAbort}
+              style={({ pressed }) => [
+                styles.sendButton,
+                { backgroundColor: theme.red },
+                pressed ? styles.sendButtonPressed : undefined,
+              ]}
+            >
+              <AppIcon icon={Square} size={16} color={theme.onPrimary} fill={theme.onPrimary} />
+            </Pressable>
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t("chat.send")}
+              accessibilityState={{ disabled: !hasText }}
+              disabled={!hasText}
+              onPress={handleSend}
+              style={({ pressed }) => [
+                styles.sendButton,
+                { backgroundColor: hasText ? theme.primary : composerBorder },
+                pressed && hasText ? styles.sendButtonPressed : undefined,
+              ]}
+            >
+              <AppIcon
+                icon={ArrowUp}
+                size={20}
+                color={hasText ? theme.onPrimary : theme.textSecondary}
+              />
+            </Pressable>
+          )}
         </View>
       </View>
     </View>

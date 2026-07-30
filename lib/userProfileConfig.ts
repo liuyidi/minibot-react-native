@@ -9,9 +9,9 @@ export type UserProfile = {
 const PROFILE_STORAGE_KEY = "user_profile";
 
 export const DEFAULT_PROFILE: UserProfile = {
-  nickname: "DeepSeek 用户",
+  nickname: "Minibot 用户",
   bio: "探索 AI 对话的更多可能",
-  avatarColor: "#1063FD",
+  avatarColor: "#1A1C1F",
 };
 
 export async function getUserProfile(): Promise<UserProfile> {

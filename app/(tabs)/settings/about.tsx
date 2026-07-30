@@ -1,3 +1,4 @@
+import { CloudDownload, Info } from "lucide-react-native";
 import { router } from "expo-router";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -5,17 +6,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
 import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
 import { ThemedText } from "@/components/ThemedText";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { getAppVersion } from "@/lib/appVersion";
 
 const APP_VERSION = getAppVersion();
 
 export default function AboutSettingsScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
 
   const handleCheckUpdate = () => {
-    Alert.alert("版本更新", `当前已是最新版本 ${APP_VERSION}。`);
+    Alert.alert(
+      t("about.upToDateTitle"),
+      t("about.upToDateBody", { version: APP_VERSION })
+    );
   };
 
   return (
@@ -29,22 +35,24 @@ export default function AboutSettingsScreen() {
     >
       <SettingsGroup>
         <SettingsNavRow
-          title="版本更新"
+          title={t("about.checkUpdate")}
           value={`v${APP_VERSION}`}
-          icon="cloud-download-outline"
+          icon={CloudDownload}
           onPress={handleCheckUpdate}
         />
         <SettingsNavRow
-          title="关于 DeepSeek Chat"
-          icon="information-circle-outline"
+          title={t("about.aboutApp")}
+          icon={Info}
           showDivider={false}
           onPress={() => router.push("/(tabs)/settings/about-app")}
         />
       </SettingsGroup>
 
       <View style={styles.footer}>
-        <ThemedText type="secondary">DeepSeek Chat</ThemedText>
-        <ThemedText type="secondary">Version {APP_VERSION}</ThemedText>
+        <ThemedText type="secondary">Minibot</ThemedText>
+        <ThemedText type="secondary">
+          {t("common.version")} {APP_VERSION}
+        </ThemedText>
       </View>
     </ScrollView>
   );

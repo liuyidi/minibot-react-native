@@ -1,4 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
+import type { LucideIcon } from "lucide-react-native";
+import { CircleCheck, ChevronDown, ChevronUp } from "lucide-react-native";
 import { useCallback } from "react";
 import {
   Keyboard,
@@ -11,14 +12,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 export type ChatDropdownOption<T> = {
   value: T;
   label: string;
-  icon?: React.ComponentProps<typeof Ionicons>["name"];
+  icon?: LucideIcon;
   disabled?: boolean;
 };
 
@@ -26,8 +27,8 @@ type ChatPreferenceDropdownProps<T> = {
   menuId: string;
   activeMenuId: string | null;
   onMenuChange: (menuId: string | null) => void;
-  icon: React.ComponentProps<typeof Ionicons>["name"];
-  activeIcon?: React.ComponentProps<typeof Ionicons>["name"];
+  icon: LucideIcon;
+  activeIcon?: LucideIcon;
   label: string;
   options: ChatDropdownOption<T>[];
   selected: T;
@@ -86,21 +87,21 @@ export function ChatPreferenceDropdown<T>({
           triggerStyle,
           {
             backgroundColor: theme.card,
-            borderColor: isOpen ? Colors.primary : theme.border,
+            borderColor: isOpen ? theme.primary : theme.border,
           },
           pressed && styles.pressed,
         ]}
       >
-        <Ionicons
-          name={displayIcon}
+        <AppIcon
+          icon={displayIcon}
           size={14}
-          color={isOpen ? Colors.primary : theme.textSecondary}
+          color={isOpen ? theme.primary : theme.textSecondary}
         />
         <ThemedText type="defaultSemiBold" style={styles.chipText}>
           {label}
         </ThemedText>
-        <Ionicons
-          name={isOpen ? "chevron-up" : "chevron-down"}
+        <AppIcon
+          icon={isOpen ? ChevronUp : ChevronDown}
           size={14}
           color={theme.textSecondary}
         />
@@ -156,11 +157,11 @@ export function ChatPreferenceDropdown<T>({
                         { backgroundColor: theme.background },
                       ]}
                     >
-                      <Ionicons
-                        name={option.icon}
+                      <AppIcon
+                        icon={option.icon}
                         size={18}
                         color={
-                          selectedOption ? Colors.primary : theme.textSecondary
+                          selectedOption ? theme.primary : theme.textSecondary
                         }
                       />
                     </View>
@@ -175,10 +176,10 @@ export function ChatPreferenceDropdown<T>({
                     {option.label}
                   </ThemedText>
                   {selectedOption ? (
-                    <Ionicons
-                      name="checkmark-circle"
+                    <AppIcon
+                      icon={CircleCheck}
                       size={20}
-                      color={Colors.primary}
+                      color={theme.primary}
                     />
                   ) : (
                     <View

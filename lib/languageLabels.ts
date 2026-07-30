@@ -1,3 +1,5 @@
+import { Languages, Globe, type LucideIcon } from "lucide-react-native";
+
 import type { AppLanguage } from "@/lib/languageConfig";
 
 export const LANGUAGE_LABELS: Record<AppLanguage, string> = {
@@ -8,16 +10,16 @@ export const LANGUAGE_LABELS: Record<AppLanguage, string> = {
 export const LANGUAGE_OPTIONS: {
   value: AppLanguage;
   label: string;
-  icon: "language-outline" | "globe-outline";
+  icon: LucideIcon;
 }[] = [
   {
     value: "zh",
     label: "简体中文",
-    icon: "language-outline",
+    icon: Languages,
   },
   {
     value: "en",
     label: "English",
-    icon: "globe-outline",
+    icon: Globe,
   },
 ];

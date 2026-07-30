@@ -1,6 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { useFocusEffect } from "expo-router";
+import { Copy, Eye, EyeOff } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -15,9 +15,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { ExternalLink } from "@/components/ExternalLink";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import {
   clearDeepSeekApiKey,
@@ -27,6 +29,7 @@ import {
 } from "@/lib/deepseekConfig";
 
 export default function ApiKeySettingsScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const [savedKey, setSavedKey] = useState<string | null>(null);
@@ -51,11 +54,11 @@ export default function ApiKeySettingsScreen() {
   const handleSaveApiKey = async () => {
     const trimmed = draftKey.trim();
     if (!trimmed) {
-      Alert.alert("请输入 API Key", "密钥不能为空。");
+      Alert.alert(t("apiKey.emptyAlertTitle"), t("apiKey.emptyAlertBody"));
       return;
     }
     if (!trimmed.startsWith("sk-")) {
-      Alert.alert("格式可能有误", "DeepSeek API Key 通常以 sk- 开头。");
+      Alert.alert(t("apiKey.formatWarnTitle"), t("apiKey.formatWarnBody"));
       return;
     }
 
@@ -65,9 +68,9 @@ export default function ApiKeySettingsScreen() {
       setSavedKey(trimmed);
       setDraftKey("");
       setIsSavedKeyVisible(false);
-      Alert.alert("保存成功", "API Key 已保存。");
+      Alert.alert(t("apiKey.saveSuccessTitle"), t("apiKey.saveSuccessBody"));
     } catch {
-      Alert.alert("保存失败", "请稍后重试。");
+      Alert.alert(t("apiKey.saveFailTitle"), t("apiKey.saveFailBody"));
     } finally {
       setIsSavingKey(false);
     }
@@ -78,14 +81,14 @@ export default function ApiKeySettingsScreen() {
       return;
     }
     await Clipboard.setStringAsync(savedKey);
-    Alert.alert("已复制", "API Key 已复制到剪贴板。");
+    Alert.alert(t("apiKey.copiedTitle"), t("apiKey.copiedBody"));
   };
 
   const handleClearApiKey = () => {
-    Alert.alert("清除 API Key", "清除后需要重新配置才能聊天。", [
-      { text: "取消", style: "cancel" },
+    Alert.alert(t("apiKey.clearConfirmTitle"), t("apiKey.clearConfirmBody"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "清除",
+        text: t("apiKey.clearAction"),
         style: "destructive",
         onPress: async () => {
           await clearDeepSeekApiKey();
@@ -116,7 +119,7 @@ export default function ApiKeySettingsScreen() {
             { backgroundColor: theme.card, borderColor: theme.border },
           ]}
         >
-          <ThemedText type="defaultSemiBold">DeepSeek API Key</ThemedText>
+          <ThemedText type="defaultSemiBold">{t("settingsTitles.apiKey")}</ThemedText>
           {savedKey ? (
             <View style={styles.savedKeyRow}>
               <ThemedText
@@ -124,39 +127,41 @@ export default function ApiKeySettingsScreen() {
                 style={styles.savedKeyText}
                 numberOfLines={1}
               >
-                已配置 {isSavedKeyVisible ? savedKey : maskApiKey(savedKey)}
+                {t("apiKey.configured", {
+                  key: isSavedKeyVisible ? savedKey : maskApiKey(savedKey),
+                })}
               </ThemedText>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={isSavedKeyVisible ? "隐藏 API Key" : "显示 API Key"}
+                accessibilityLabel={
+                  isSavedKeyVisible ? t("apiKey.hideA11y") : t("apiKey.showA11y")
+                }
                 hitSlop={8}
                 onPress={() => setIsSavedKeyVisible((current) => !current)}
                 style={styles.iconButton}
               >
-                <Ionicons
-                  name={isSavedKeyVisible ? "eye-off-outline" : "eye-outline"}
+                <AppIcon
+                  icon={isSavedKeyVisible ? EyeOff : Eye}
                   size={20}
                   color={theme.textSecondary}
                 />
               </Pressable>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="复制 API Key"
+                accessibilityLabel={t("apiKey.copyA11y")}
                 hitSlop={8}
                 onPress={() => void handleCopyApiKey()}
                 style={styles.iconButton}
               >
-                <Ionicons
-                  name="copy-outline"
+                <AppIcon
+                  icon={Copy}
                   size={20}
                   color={theme.textSecondary}
                 />
               </Pressable>
             </View>
           ) : (
-            <ThemedText type="secondary">
-              尚未配置，聊天功能需要先设置 API Key
-            </ThemedText>
+            <ThemedText type="secondary">{t("apiKey.emptyBody")}</ThemedText>
           )}
           <View
             style={[
@@ -167,7 +172,7 @@ export default function ApiKeySettingsScreen() {
             <TextInput
               value={draftKey}
               onChangeText={setDraftKey}
-              placeholder={savedKey ? "输入新密钥以更新" : "sk-xxxxxxxxxxxxxxxx"}
+              placeholder={savedKey ? t("apiKey.placeholderUpdate") : "sk-xxxxxxxxxxxxxxxx"}
               placeholderTextColor={theme.textSecondary}
               autoCapitalize="none"
               autoCorrect={false}
@@ -179,7 +184,9 @@ export default function ApiKeySettingsScreen() {
               onPress={() => setIsKeyVisible((current) => !current)}
               style={styles.eyeButton}
             >
-              <ThemedText type="link">{isKeyVisible ? "隐藏" : "显示"}</ThemedText>
+              <ThemedText type="link">
+                {isKeyVisible ? t("apiKey.hide") : t("apiKey.show")}
+              </ThemedText>
             </Pressable>
           </View>
           <Pressable
@@ -188,22 +195,25 @@ export default function ApiKeySettingsScreen() {
             onPress={() => void handleSaveApiKey()}
             style={({ pressed }) => [
               styles.primaryButton,
+              { backgroundColor: theme.primary },
               (pressed || isSavingKey) && styles.pressed,
             ]}
           >
             {isSavingKey ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={theme.onPrimary} />
             ) : (
-              <ThemedText style={styles.primaryButtonText}>保存密钥</ThemedText>
+              <ThemedText style={[styles.primaryButtonText, { color: theme.onPrimary }]}>
+                {t("apiKey.save")}
+              </ThemedText>
             )}
           </Pressable>
           {savedKey ? (
             <Pressable accessibilityRole="button" onPress={handleClearApiKey}>
-              <ThemedText style={styles.clearKeyText}>清除密钥</ThemedText>
+              <ThemedText style={styles.clearKeyText}>{t("apiKey.clear")}</ThemedText>
             </Pressable>
           ) : null}
           <ExternalLink href="https://platform.deepseek.com/">
-            <ThemedText type="link">前往 DeepSeek 平台获取密钥 →</ThemedText>
+            <ThemedText type="link">{t("apiKey.getKeyLink")}</ThemedText>
           </ExternalLink>
         </View>
 
@@ -213,12 +223,8 @@ export default function ApiKeySettingsScreen() {
             { backgroundColor: theme.card, borderColor: theme.border },
           ]}
         >
-          <ThemedText type="defaultSemiBold">如何获取 API Key</ThemedText>
-          <ThemedText type="secondary">
-            1. 登录 DeepSeek 开放平台{"\n"}
-            2. 进入 API Keys 页面{"\n"}
-            3. 点击 Create API Key 并复制密钥
-          </ThemedText>
+          <ThemedText type="defaultSemiBold">{t("apiKey.howToTitle")}</ThemedText>
+          <ThemedText type="secondary">{t("apiKey.howToBody")}</ThemedText>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -273,14 +279,12 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   primaryButton: {
-    backgroundColor: Colors.primary,
     borderRadius: 14,
     minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
   },
   primaryButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "700",
   },

@@ -29,7 +29,7 @@ function parseApiError(error: unknown, fallback: string): string {
     }
 
     if (error.message === "Network Error") {
-      return "无法连接服务器，请确认 deepseek-chat-api 已启动。";
+      return "无法连接服务器，请确认后端服务已启动。";
     }
   }
 

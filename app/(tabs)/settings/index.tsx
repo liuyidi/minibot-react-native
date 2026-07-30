@@ -1,22 +1,38 @@
-import { Ionicons } from "@expo/vector-icons";
+import {
+  BarChart3,
+  Box,
+  ChevronRight,
+  CircleUser,
+  Info,
+  Key,
+  Languages,
+  Lightbulb,
+  Palette,
+  Server,
+} from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
 import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
 import { useChatPreferences } from "@/context/ChatPreferencesContext";
 import { useAppearance } from "@/context/AppearanceContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useMinibot } from "@/context/MinibotClientContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
-import { maskEmail, maskPhone, type AccountInfo, getAccountInfo } from "@/lib/accountConfig";
-import { APPEARANCE_LABELS } from "@/lib/appearanceLabels";
-import { getAppVersion } from "@/lib/appVersion";
+import {
+  maskEmail,
+  maskPhone,
+  type AccountInfo,
+  getAccountInfo,
+} from "@/lib/accountConfig";
 import { LANGUAGE_LABELS } from "@/lib/languageLabels";
+import { getAppVersion } from "@/lib/appVersion";
 import { MODEL_LABELS } from "@/lib/modelLabels";
 import { getDeepSeekApiKey, maskApiKey } from "@/lib/deepseekConfig";
 import { formatTokenCount, getTokenUsageStats } from "@/lib/tokenUsageConfig";
@@ -31,14 +47,46 @@ const APP_VERSION = getAppVersion();
 export default function SettingsHubScreen() {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
-  const { mode: appearanceMode, setMode } = useAppearance();
+  const { t } = useLanguage();
+  const { mode: appearanceMode, setMode, themeDefinition } = useAppearance();
   const { language } = useLanguage();
   const { model, isThinkingActive } = useChatPreferences();
   const { user: authUser, logout } = useAuth();
+  const { status: minibotStatus, isConnected, modelName } = useMinibot();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [account, setAccount] = useState<AccountInfo | null>(null);
-  const [apiKeySummary, setApiKeySummary] = useState("未配置");
+  const [apiKeySummary, setApiKeySummary] = useState("—");
   const [usageSummary, setUsageSummary] = useState("0");
+
+  const statusLabel = (status: string) => {
+    switch (status) {
+      case "idle":
+        return t("me.statusIdle");
+      case "connecting":
+        return t("me.statusConnecting");
+      case "open":
+        return t("me.statusOpen");
+      case "reconnecting":
+        return t("me.statusReconnecting");
+      case "closed":
+        return t("me.statusClosed");
+      case "error":
+        return t("me.statusError");
+      default:
+        return status;
+    }
+  };
+
+  const appearanceLabel = () => {
+    switch (appearanceMode) {
+      case "light":
+        return t("appearance.light");
+      case "dark":
+        return t("appearance.dark");
+      default:
+        return t("appearance.system");
+    }
+  };
 
   const loadPreviewData = useCallback(async () => {
     const [nextProfile, nextAccount, apiKey, usageStats] = await Promise.all([
@@ -49,7 +97,7 @@ export default function SettingsHubScreen() {
     ]);
     setProfile(nextProfile);
     setAccount(nextAccount);
-    setApiKeySummary(apiKey ? maskApiKey(apiKey) : "未配置");
+    setApiKeySummary(apiKey ? maskApiKey(apiKey) : "—");
     setUsageSummary(formatTokenCount(usageStats.totalTokens));
   }, []);
 
@@ -60,10 +108,10 @@ export default function SettingsHubScreen() {
   );
 
   const handleLogout = () => {
-    Alert.alert("退出登录", "确定退出当前账号？", [
-      { text: "取消", style: "cancel" },
+    Alert.alert(t("me.logoutConfirmTitle"), t("me.logoutConfirmMessage"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "退出登录",
+        text: t("me.logout"),
         style: "destructive",
         onPress: () => {
           void logout().then(async () => {
@@ -75,232 +123,185 @@ export default function SettingsHubScreen() {
     ]);
   };
 
-  const profileName = authUser?.nickname ?? profile?.nickname ?? "DeepSeek 用户";
+  const profileName =
+    authUser?.nickname ?? profile?.nickname ?? t("me.defaultName");
   const profileBio =
     authUser?.bio?.trim() ||
     profile?.bio ||
     authUser?.email ||
-    "探索 AI 对话的更多可能";
+    t("me.defaultBio");
 
   const accountHubValue = account?.phone
     ? maskPhone(account.phone)
     : account?.wechatBound
-      ? "微信已绑定"
+      ? t("me.wechatBound")
       : account?.email
         ? maskEmail(account.email)
-        : "未绑定";
+        : t("me.unbound");
+
+  const serverValue = isConnected
+    ? modelName
+      ? t("me.connectedWithModel", { model: modelName })
+      : t("me.statusOpen")
+    : statusLabel(minibotStatus);
+
+  const connectionTone = isConnected ? theme.green : theme.textSecondary;
 
   return (
     <ScrollView
       style={[styles.screen, { backgroundColor: theme.background }]}
-      contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 100 }]}
-      stickyHeaderIndices={[0]}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: insets.top + 20,
+          paddingBottom: insets.bottom + 108,
+        },
+      ]}
       showsVerticalScrollIndicator={false}
     >
-      <View
-        style={[
-          styles.stickyHeader,
-          {
-            paddingTop: insets.top + 16,
-            backgroundColor: theme.background,
-            borderBottomColor: theme.border,
-          },
-        ]}
-      >
-        <ThemedText type="title" style={styles.title}>
-          我的
-        </ThemedText>
-      </View>
-
-      <View style={styles.body}>
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={t("me.editProfile")}
         onPress={() => router.push("/(tabs)/settings/profile")}
-        style={({ pressed }) => [
-          styles.profileCard,
-          {
-            backgroundColor: theme.card,
-            borderColor: theme.border,
-          },
-          pressed && styles.pressed,
-        ]}
+        style={({ pressed }) => [styles.identity, pressed && styles.pressed]}
       >
         <View
           style={[
             styles.avatar,
-            { backgroundColor: profile?.avatarColor ?? Colors.primary },
+            { backgroundColor: profile?.avatarColor ?? theme.primary },
           ]}
         >
           <ThemedText style={styles.avatarText}>
-            {getProfileInitial(profile?.nickname ?? "U")}
+            {getProfileInitial(profileName)}
           </ThemedText>
         </View>
-        <View style={styles.profileContent}>
-          <ThemedText type="defaultSemiBold" style={styles.profileName}>
+        <View style={styles.identityText}>
+          <ThemedText type="defaultSemiBold" style={styles.name}>
             {profileName}
           </ThemedText>
-          <ThemedText type="secondary" numberOfLines={1}>
+          <ThemedText type="secondary" numberOfLines={2} style={styles.bio}>
             {profileBio}
           </ThemedText>
+          <View style={styles.statusRow}>
+            <View style={[styles.statusDot, { backgroundColor: connectionTone }]} />
+            <ThemedText type="secondary" style={styles.statusLabel}>
+              {serverValue}
+            </ThemedText>
+          </View>
         </View>
-        <Ionicons name="chevron-forward" size={20} color={theme.textSecondary} />
+        <AppIcon icon={ChevronRight} size={20} color={theme.textSecondary} />
       </Pressable>
 
-      <SettingsGroup>
-        <SettingsNavRow
-          title="外观"
-          value={APPEARANCE_LABELS[appearanceMode]}
-          icon="color-palette-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/appearance")}
-        />
-      </SettingsGroup>
+      <View style={styles.sections}>
+        <SettingsGroup title={t("me.sectionConnection")}>
+          <SettingsNavRow
+            title={t("me.server")}
+            value={statusLabel(minibotStatus)}
+            icon={Server}
+            showDivider={false}
+            onPress={() => router.push("/(tabs)/settings/server")}
+          />
+        </SettingsGroup>
 
-      <SettingsGroup>
-        <SettingsNavRow
-          title="语言"
-          value={LANGUAGE_LABELS[language]}
-          icon="language-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/language")}
-        />
-      </SettingsGroup>
+        <SettingsGroup title={t("me.sectionPrefs")}>
+          <SettingsNavRow
+            title={t("me.appearance")}
+            value={`${themeDefinition.name} · ${appearanceLabel()}`}
+            icon={Palette}
+            onPress={() => router.push("/(tabs)/settings/appearance")}
+          />
+          <SettingsNavRow
+            title={t("me.language")}
+            value={LANGUAGE_LABELS[language]}
+            icon={Languages}
+            onPress={() => router.push("/(tabs)/settings/language")}
+          />
+          <SettingsNavRow
+            title={t("me.model")}
+            value={MODEL_LABELS[model]}
+            icon={Box}
+            onPress={() => router.push("/(tabs)/settings/model")}
+          />
+          <SettingsNavRow
+            title={t("me.thinking")}
+            value={isThinkingActive ? t("common.on") : t("common.off")}
+            icon={Lightbulb}
+            showDivider={false}
+            onPress={() => router.push("/(tabs)/settings/thinking")}
+          />
+        </SettingsGroup>
 
-      <SettingsGroup>
-        <SettingsNavRow
-          title="账号管理"
-          value={accountHubValue}
-          icon="person-circle-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/account")}
-        />
-      </SettingsGroup>
+        <SettingsGroup title={t("me.sectionAccount")}>
+          <SettingsNavRow
+            title={t("me.account")}
+            value={accountHubValue}
+            icon={CircleUser}
+            onPress={() => router.push("/(tabs)/settings/account")}
+          />
+          <SettingsNavRow
+            title={t("me.apiKey")}
+            value={apiKeySummary}
+            icon={Key}
+            onPress={() => router.push("/(tabs)/settings/api-key")}
+          />
+          <SettingsNavRow
+            title={t("me.usage")}
+            value={usageSummary}
+            icon={BarChart3}
+            showDivider={false}
+            onPress={() => router.push("/(tabs)/settings/usage")}
+          />
+        </SettingsGroup>
 
-      <SettingsGroup>
-        <SettingsNavRow
-          title="API Key"
-          value={apiKeySummary}
-          icon="key-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/api-key")}
-        />
-      </SettingsGroup>
+        <SettingsGroup title={t("me.sectionAbout")}>
+          <SettingsNavRow
+            title={t("me.about")}
+            value={`v${APP_VERSION}`}
+            icon={Info}
+            showDivider={false}
+            onPress={() => router.push("/(tabs)/settings/about")}
+          />
+        </SettingsGroup>
 
-      <SettingsGroup>
-        <SettingsNavRow
-          title="模型"
-          value={MODEL_LABELS[model]}
-          icon="cube-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/model")}
-        />
-      </SettingsGroup>
-
-      <SettingsGroup>
-        <SettingsNavRow
-          title="思考模式"
-          value={isThinkingActive ? "开启" : "关闭"}
-          icon="bulb-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/thinking")}
-        />
-      </SettingsGroup>
-
-      <SettingsGroup>
-        <SettingsNavRow
-          title="Token 用量"
-          value={usageSummary}
-          icon="analytics-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/usage")}
-        />
-      </SettingsGroup>
-
-      <SettingsGroup>
-        <SettingsNavRow
-          title="关于"
-          value={`v${APP_VERSION}`}
-          icon="information-circle-outline"
-          showDivider={false}
-          onPress={() => router.push("/(tabs)/settings/about")}
-        />
-      </SettingsGroup>
-
-      <View style={styles.logoutWrap}>
         <Pressable
           accessibilityRole="button"
           onPress={handleLogout}
-          style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+          style={({ pressed }) => [styles.logout, pressed && styles.pressed]}
         >
-          <ThemedText style={styles.logoutText}>退出登录</ThemedText>
+          <ThemedText style={[styles.logoutText, { color: theme.red }]}>
+            {t("me.logout")}
+          </ThemedText>
         </Pressable>
-      </View>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  content: {
-    flexGrow: 1,
-  },
-  stickyHeader: {
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  body: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    gap: 16,
-  },
-  title: {
-    fontSize: 32,
-  },
-  profileCard: {
+  screen: { flex: 1 },
+  content: { paddingHorizontal: 20, gap: 28 },
+  identity: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 16,
+    gap: 16,
+    paddingVertical: 4,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "700",
-  },
-  profileContent: {
-    flex: 1,
-    gap: 4,
-  },
-  profileName: {
-    fontSize: 18,
-  },
-  logoutWrap: {
-    alignItems: "center",
-    marginTop: 8,
-  },
-  logoutButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-  logoutText: {
-    color: Colors.red,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  pressed: {
-    opacity: 0.72,
-  },
+  avatarText: { color: "#FFFFFF", fontSize: 24, fontWeight: "700" },
+  identityText: { flex: 1, gap: 4, minWidth: 0 },
+  name: { fontSize: 24, letterSpacing: -0.3 },
+  bio: { fontSize: 14, lineHeight: 20 },
+  statusRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },
+  statusDot: { width: 6, height: 6, borderRadius: 3 },
+  statusLabel: { fontSize: 13, flexShrink: 1 },
+  sections: { gap: 22 },
+  logout: { alignItems: "center", paddingVertical: 14 },
+  logoutText: { fontSize: 16, fontWeight: "600" },
+  pressed: { opacity: 0.72 },
 });

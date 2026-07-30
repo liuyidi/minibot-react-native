@@ -1,4 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
+import {
+  ArrowDown,
+  ArrowUp,
+  BarChart3,
+  Key,
+  MessagesSquare,
+} from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -12,10 +18,12 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
 import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
+import { useLanguage, useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import {
   fetchDeepSeekBalance,
@@ -31,15 +39,15 @@ import {
   type TokenUsageStats,
 } from "@/lib/tokenUsageConfig";
 
-function formatUpdatedAt(iso: string | null): string {
+function formatUpdatedAt(iso: string | null, locale: string, noRecords: string): string {
   if (!iso) {
-    return "暂无记录";
+    return noRecords;
   }
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) {
-    return "暂无记录";
+    return noRecords;
   }
-  return date.toLocaleString("zh-CN", {
+  return date.toLocaleString(locale, {
     month: "numeric",
     day: "numeric",
     hour: "2-digit",
@@ -48,6 +56,8 @@ function formatUpdatedAt(iso: string | null): string {
 }
 
 export default function TokenUsageSettingsScreen() {
+  const t = useT();
+  const { language } = useLanguage();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const [hasApiKey, setHasApiKey] = useState(false);
@@ -56,6 +66,8 @@ export default function TokenUsageSettingsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const locale = language === "zh" ? "zh-CN" : "en-US";
 
   const loadData = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) {
@@ -74,7 +86,7 @@ export default function TokenUsageSettingsScreen() {
 
       if (!apiKey) {
         setBalance(null);
-        setErrorMessage("请先配置 API Key 后查看账户余额。");
+        setErrorMessage(t("usage.needApiKey"));
         return;
       }
 
@@ -82,12 +94,12 @@ export default function TokenUsageSettingsScreen() {
       setBalance(nextBalance);
       setErrorMessage(null);
     } catch {
-      setErrorMessage("加载失败，请检查网络或 API Key 是否有效。");
+      setErrorMessage(t("usage.loadFailed"));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -96,10 +108,10 @@ export default function TokenUsageSettingsScreen() {
   );
 
   const handleResetStats = () => {
-    Alert.alert("重置统计", "将清除本机累计的 Token 用量记录，不影响 DeepSeek 账户余额。", [
-      { text: "取消", style: "cancel" },
+    Alert.alert(t("usage.resetTitle"), t("usage.resetBody"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "重置",
+        text: t("usage.resetAction"),
         style: "destructive",
         onPress: () => {
           void resetTokenUsageStats().then(async () => {
@@ -112,6 +124,11 @@ export default function TokenUsageSettingsScreen() {
   };
 
   const primaryBalance = balance ? pickPrimaryBalance(balance.balances) : null;
+  const lastUpdatedText = formatUpdatedAt(
+    stats?.lastUpdatedAt ?? null,
+    locale,
+    t("usage.noRecords")
+  );
 
   return (
     <ScrollView
@@ -124,14 +141,14 @@ export default function TokenUsageSettingsScreen() {
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={() => void loadData(true)}
-          tintColor={Colors.primary}
+          tintColor={theme.primary}
         />
       }
       showsVerticalScrollIndicator={false}
     >
       {isLoading ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={theme.primary} />
         </View>
       ) : (
         <>
@@ -142,20 +159,23 @@ export default function TokenUsageSettingsScreen() {
                 { backgroundColor: theme.card, borderColor: theme.border },
               ]}
             >
-              <Ionicons name="key-outline" size={28} color={Colors.primary} />
-              <ThemedText type="defaultSemiBold">尚未配置 API Key</ThemedText>
+              <AppIcon icon={Key} size={28} color={theme.primary} />
+              <ThemedText type="defaultSemiBold">{t("usage.noApiTitle")}</ThemedText>
               <ThemedText type="secondary" style={styles.noticeText}>
-                配置后可查询账户余额，聊天时会自动累计本机 Token 用量。
+                {t("usage.noApiBody")}
               </ThemedText>
               <Pressable
                 accessibilityRole="button"
                 onPress={() => router.push("/(tabs)/settings/api-key")}
                 style={({ pressed }) => [
                   styles.noticeButton,
+                  { backgroundColor: theme.primary },
                   pressed && styles.pressed,
                 ]}
               >
-                <ThemedText style={styles.noticeButtonText}>去配置</ThemedText>
+                <ThemedText style={styles.noticeButtonText}>
+                  {t("usage.goConfigure")}
+                </ThemedText>
               </Pressable>
             </View>
           ) : null}
@@ -174,7 +194,7 @@ export default function TokenUsageSettingsScreen() {
           {primaryBalance ? (
             <View style={styles.section}>
               <ThemedText type="secondary" style={styles.sectionTitle}>
-                账户余额
+                {t("usage.balanceTitle")}
               </ThemedText>
               <View
                 style={[
@@ -182,7 +202,7 @@ export default function TokenUsageSettingsScreen() {
                   { backgroundColor: theme.card, borderColor: theme.border },
                 ]}
               >
-                <ThemedText type="secondary">可用余额</ThemedText>
+                <ThemedText type="secondary">{t("usage.availableBalance")}</ThemedText>
                 <ThemedText type="title" style={styles.balanceAmount}>
                   {formatBalanceAmount(
                     primaryBalance.total_balance,
@@ -190,11 +210,11 @@ export default function TokenUsageSettingsScreen() {
                   )}
                 </ThemedText>
                 <ThemedText type="secondary">
-                  {balance?.isAvailable ? "余额充足，可正常调用 API" : "余额不足，请及时充值"}
+                  {balance?.isAvailable ? t("usage.balanceOk") : t("usage.balanceLow")}
                 </ThemedText>
                 <View style={styles.balanceBreakdown}>
                   <View style={styles.breakdownItem}>
-                    <ThemedText type="secondary">充值余额</ThemedText>
+                    <ThemedText type="secondary">{t("usage.topupBalance")}</ThemedText>
                     <ThemedText type="defaultSemiBold">
                       {formatBalanceAmount(
                         primaryBalance.topped_up_balance,
@@ -203,7 +223,7 @@ export default function TokenUsageSettingsScreen() {
                     </ThemedText>
                   </View>
                   <View style={styles.breakdownItem}>
-                    <ThemedText type="secondary">赠送余额</ThemedText>
+                    <ThemedText type="secondary">{t("usage.grantBalance")}</ThemedText>
                     <ThemedText type="defaultSemiBold">
                       {formatBalanceAmount(
                         primaryBalance.granted_balance,
@@ -218,33 +238,33 @@ export default function TokenUsageSettingsScreen() {
 
           <View style={styles.section}>
             <ThemedText type="secondary" style={styles.sectionTitle}>
-              本机 Token 用量
+              {t("usage.localUsage")}
             </ThemedText>
             <SettingsGroup>
               <SettingsNavRow
-                title="累计 Token"
+                title={t("usage.totalTokens")}
                 value={formatTokenCount(stats?.totalTokens ?? 0)}
-                icon="analytics-outline"
+                icon={BarChart3}
               />
               <SettingsNavRow
-                title="输入 Token"
+                title={t("usage.inputTokens")}
                 value={formatTokenCount(stats?.promptTokens ?? 0)}
-                icon="arrow-down-outline"
+                icon={ArrowDown}
               />
               <SettingsNavRow
-                title="输出 Token"
+                title={t("usage.outputTokens")}
                 value={formatTokenCount(stats?.completionTokens ?? 0)}
-                icon="arrow-up-outline"
+                icon={ArrowUp}
               />
               <SettingsNavRow
-                title="请求次数"
+                title={t("usage.requestCount")}
                 value={String(stats?.requestCount ?? 0)}
-                icon="chatbubbles-outline"
+                icon={MessagesSquare}
                 showDivider={false}
               />
             </SettingsGroup>
             <ThemedText type="secondary" style={styles.hint}>
-              统计本 App 内聊天产生的 Token，最后更新：{formatUpdatedAt(stats?.lastUpdatedAt ?? null)}
+              {t("usage.lastUpdated", { time: lastUpdatedText })}
             </ThemedText>
           </View>
 
@@ -253,7 +273,7 @@ export default function TokenUsageSettingsScreen() {
             onPress={handleResetStats}
             style={({ pressed }) => [styles.resetButton, pressed && styles.pressed]}
           >
-            <ThemedText style={styles.resetText}>重置本机统计</ThemedText>
+            <ThemedText style={styles.resetText}>{t("usage.resetLocal")}</ThemedText>
           </Pressable>
         </>
       )}
@@ -318,7 +338,6 @@ const styles = StyleSheet.create({
   },
   noticeButton: {
     marginTop: 4,
-    backgroundColor: Colors.primary,
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 10,

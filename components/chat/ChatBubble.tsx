@@ -9,7 +9,7 @@ import {
 import { ChatMessageText } from "@/components/chat/ChatMessageText";
 import { ThemedText } from "@/components/ThemedText";
 import type { AppChatMessage } from "@/types/chat";
-import { Colors } from "@/constants/Colors";
+import { useLanguage } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 type ChatBubbleProps = BubbleProps<AppChatMessage> & {
@@ -19,7 +19,8 @@ type ChatBubbleProps = BubbleProps<AppChatMessage> & {
 
 export function ChatBubble(props: ChatBubbleProps) {
   const theme = useAppTheme();
-  const { colorScheme, currentMessage, isStreaming = false } = props;
+  const { t } = useLanguage();
+  const { currentMessage, isStreaming = false } = props;
   const reasoningContent = currentMessage?.reasoningContent?.trim();
   const [isReasoningExpanded, setIsReasoningExpanded] = useState(false);
   const isAssistant = currentMessage?.user._id !== 1;
@@ -42,7 +43,7 @@ export function ChatBubble(props: ChatBubbleProps) {
           style={[
             styles.reasoningCard,
             {
-              backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#F4F4F5",
+              backgroundColor: theme.card,
               borderColor: theme.border,
             },
           ]}
@@ -54,10 +55,10 @@ export function ChatBubble(props: ChatBubbleProps) {
             style={styles.reasoningHeader}
           >
             <ThemedText type="defaultSemiBold" style={styles.reasoningTitle}>
-              思考过程
+              {t("chat.thinkingProcess")}
             </ThemedText>
             <ThemedText type="secondary" style={styles.reasoningToggle}>
-              {isReasoningExpanded ? "收起" : "展开"}
+              {isReasoningExpanded ? t("chat.collapse") : t("chat.expand")}
             </ThemedText>
           </Pressable>
           {isReasoningExpanded ? (
@@ -72,36 +73,46 @@ export function ChatBubble(props: ChatBubbleProps) {
         renderMessageText={renderMessageText}
         currentMessage={
           isPendingReply
-            ? { ...currentMessage!, text: "正在回复…" }
+            ? { ...currentMessage!, text: t("chat.replying") }
             : currentMessage
         }
+        containerStyle={{
+          left: styles.bubbleContainerLeft,
+          right: styles.bubbleContainerRight,
+        }}
         wrapperStyle={{
           right: {
-            backgroundColor: colorScheme === "dark" ? "#1E3A5F" : "#E8F0FF",
+            backgroundColor: theme.userBubble,
             borderRadius: 18,
+            paddingHorizontal: 2,
+            marginLeft: 56,
           },
           left: {
-            backgroundColor: theme.card,
+            backgroundColor: theme.assistantBubble,
             borderRadius: 18,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: theme.border,
+            // GiftedChat default is marginRight: 60; match Message left inset (8).
+            marginRight: 8,
+            paddingLeft: 0,
           },
         }}
         textStyle={{
-          right: { color: colorScheme === "dark" ? "#EBEBF5" : "#1C1C1E" },
+          right: { color: theme.userBubbleText },
           left: { color: theme.text },
         }}
-        timeTextStyle={{
-          left: {
-            color: theme.textSecondary,
-            fontSize: 11,
+        // GiftedChat typings omit timeTextStyle; still supported at runtime.
+        {...({
+          timeTextStyle: {
+            left: {
+              color: theme.textSecondary,
+              fontSize: 11,
+            },
+            right: {
+              color: theme.textSecondary,
+              fontSize: 11,
+              fontWeight: "500",
+            },
           },
-          right: {
-            color: colorScheme === "dark" ? "#A8C7FF" : Colors.muted,
-            fontSize: 11,
-            fontWeight: "500",
-          },
-        }}
+        } as object)}
       />
     </View>
   );
@@ -110,10 +121,18 @@ export function ChatBubble(props: ChatBubbleProps) {
 const styles = StyleSheet.create({
   wrap: {
     gap: 6,
+    flex: 1,
+  },
+  bubbleContainerLeft: {
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  bubbleContainerRight: {
+    marginLeft: 0,
   },
   reasoningCard: {
-    marginLeft: 8,
-    marginRight: 48,
+    marginLeft: 0,
+    marginRight: 8,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 12,

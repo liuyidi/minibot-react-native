@@ -1,3 +1,4 @@
+import { Mail, MessageCircle, Phone, Trash2 } from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -13,6 +14,7 @@ import { SettingsGroup } from "@/components/settings/SettingsGroup";
 import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
 import { useAppearance } from "@/context/AppearanceContext";
 import { useAuth } from "@/context/AuthContext";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import {
   DEFAULT_ACCOUNT,
@@ -25,6 +27,7 @@ import {
 import { deleteAccount } from "@/lib/sessionConfig";
 
 export default function AccountSettingsScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { setMode } = useAppearance();
@@ -49,11 +52,11 @@ export default function AccountSettingsScreen() {
 
   const handleFieldSave = (field: "phone" | "email", value: string) => {
     if (field === "phone" && value && !/^1\d{10}$/.test(value)) {
-      Alert.alert("格式有误", "请输入 11 位中国大陆手机号。");
+      Alert.alert(t("account.invalidPhoneTitle"), t("account.invalidPhoneBody"));
       return;
     }
     if (field === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      Alert.alert("格式有误", "请输入有效的邮箱地址。");
+      Alert.alert(t("account.invalidEmailTitle"), t("account.invalidEmailBody"));
       return;
     }
     void updateAccount({
@@ -65,10 +68,10 @@ export default function AccountSettingsScreen() {
 
   const handleWechatBind = () => {
     if (account.wechatBound) {
-      Alert.alert("解绑微信", "确定解除当前微信绑定？", [
-        { text: "取消", style: "cancel" },
+      Alert.alert(t("account.unbindWechatTitle"), t("account.unbindWechatBody"), [
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "解绑",
+          text: t("account.unbind"),
           style: "destructive",
           onPress: () => {
             void updateAccount({
@@ -82,15 +85,15 @@ export default function AccountSettingsScreen() {
       return;
     }
 
-    Alert.alert("绑定微信", "将跳转微信授权（演示：直接模拟绑定成功）", [
-      { text: "取消", style: "cancel" },
+    Alert.alert(t("account.bindWechatTitle"), t("account.bindWechatBody"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "绑定",
+        text: t("account.bind"),
         onPress: () => {
           void updateAccount({
             ...account,
             wechatBound: true,
-            wechatNickname: "微信用户",
+            wechatNickname: t("account.wechatUser"),
           });
         },
       },
@@ -98,24 +101,20 @@ export default function AccountSettingsScreen() {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      "注销账号",
-      "注销后将清除本机全部账号与聊天配置数据，此操作不可恢复。",
-      [
-        { text: "取消", style: "cancel" },
-        {
-          text: "确认注销",
-          style: "destructive",
-          onPress: () => {
-            void deleteAccount().then(async () => {
-              await logout();
-              await setMode("system");
-              router.replace("/(auth)/login");
-            });
-          },
+    Alert.alert(t("account.deleteAccountTitle"), t("account.deleteAccountBody"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("account.deleteConfirm"),
+        style: "destructive",
+        onPress: () => {
+          void deleteAccount().then(async () => {
+            await logout();
+            await setMode("system");
+            router.replace("/(auth)/login");
+          });
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -134,25 +133,25 @@ export default function AccountSettingsScreen() {
       >
         <SettingsGroup>
           <SettingsNavRow
-            title="手机号"
-            value={account.phone ? maskPhone(account.phone) : "未绑定"}
-            icon="call-outline"
+            title={t("account.phone")}
+            value={account.phone ? maskPhone(account.phone) : t("account.unbound")}
+            icon={Phone}
             onPress={() => setEditingField("phone")}
           />
           <SettingsNavRow
-            title="微信"
+            title={t("account.wechat")}
             value={
               account.wechatBound
-                ? account.wechatNickname || "已绑定"
-                : "未绑定"
+                ? account.wechatNickname || t("account.bound")
+                : t("account.unbound")
             }
-            icon="logo-wechat"
+            icon={MessageCircle}
             onPress={handleWechatBind}
           />
           <SettingsNavRow
-            title="电子邮箱"
-            value={account.email ? maskEmail(account.email) : "未设置"}
-            icon="mail-outline"
+            title={t("account.email")}
+            value={account.email ? maskEmail(account.email) : t("account.notSet")}
+            icon={Mail}
             showDivider={false}
             onPress={() => setEditingField("email")}
           />
@@ -160,8 +159,8 @@ export default function AccountSettingsScreen() {
 
         <SettingsGroup>
           <SettingsNavRow
-            title="注销账号"
-            icon="trash-outline"
+            title={t("account.deleteAccountTitle")}
+            icon={Trash2}
             destructive
             showDivider={false}
             onPress={handleDeleteAccount}
@@ -170,16 +169,16 @@ export default function AccountSettingsScreen() {
 
         <EditFieldModal
           visible={editingField === "phone"}
-          title="更改手机号"
+          title={t("account.changePhone")}
           value={account.phone}
-          placeholder="请输入 11 位手机号"
+          placeholder={t("account.phonePlaceholder")}
           keyboardType="phone-pad"
           onClose={() => setEditingField(null)}
           onSave={(value) => handleFieldSave("phone", value)}
         />
         <EditFieldModal
           visible={editingField === "email"}
-          title="更改邮箱"
+          title={t("account.changeEmail")}
           value={account.email}
           placeholder="name@example.com"
           keyboardType="email-address"

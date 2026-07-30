@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 type AuthFormFieldProps = {
@@ -30,6 +31,7 @@ export function AuthFormField({
   autoCapitalize = "none",
   autoCorrect = false,
 }: AuthFormFieldProps) {
+  const t = useT();
   const theme = useAppTheme();
 
   return (
@@ -60,7 +62,7 @@ export function AuthFormField({
             onPress={onToggleVisibility}
             style={styles.toggleButton}
           >
-            <ThemedText type="link">{isVisible ? "隐藏" : "显示"}</ThemedText>
+            <ThemedText type="link">{isVisible ? t("auth.hide") : t("auth.show")}</ThemedText>
           </Pressable>
         ) : null}
       </View>

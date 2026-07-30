@@ -1,0 +1,32 @@
+---
+description: UI icons must use lucide-react-native via AppIcon
+globs: "{app,components}/**/*.{tsx,ts,jsx,js}"
+alwaysApply: false
+---
+
+# UI icons: lucide-react-native only
+
+All new and updated UI icons in this app use **`lucide-react-native`**, wrapped by [`components/ui/AppIcon.tsx`](components/ui/AppIcon.tsx). Aligns with minibot webui (`lucide-react`).
+
+## Do
+
+```tsx
+import { House, MessageCircle } from "lucide-react-native";
+import { AppIcon } from "@/components/ui/AppIcon";
+
+<AppIcon icon={House} size={24} color={theme.text} />
+```
+
+- Pass a Lucide component as `icon={...}` (type `LucideIcon`).
+- Prefer names that match webui when possible (`Settings`, `Plus`, `ChevronRight`, `Bot`, …).
+- For selectable rows / dropdown options, store `icon: LucideIcon` on the option object (see `lib/appearanceLabels.ts`, `SettingsNavRow`).
+
+## Don’t
+
+- Do **not** add `@expo/vector-icons` (`Ionicons`, `MaterialIcons`, `MaterialCommunityIcons`) for new UI.
+- Do **not** use `expo-symbols` / `IconSymbol` for new screens (legacy stubs only).
+- Do **not** import Lucide icons and render them raw in feature code when `AppIcon` fits—keep stroke/size defaults consistent.
+
+## Legacy
+
+Existing `IconSymbol` is deprecated. When touching a file that still uses vector-icons or `IconSymbol`, migrate that usage to `AppIcon` + lucide in the same change.

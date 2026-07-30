@@ -14,13 +14,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AuthFormField } from "@/components/auth/AuthFormField";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { login, enterGuestMode, isAuthenticated, isReady } = useAuth();
@@ -36,11 +37,11 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     const trimmedEmail = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(trimmedEmail)) {
-      Alert.alert("邮箱格式有误", "请输入有效的邮箱地址。");
+      Alert.alert(t("auth.invalidEmailTitle"), t("auth.invalidEmailBody"));
       return;
     }
     if (!password) {
-      Alert.alert("请输入密码", "密码不能为空。");
+      Alert.alert(t("auth.passwordRequiredTitle"), t("auth.passwordRequiredBody"));
       return;
     }
 
@@ -49,7 +50,10 @@ export default function LoginScreen() {
       await login({ email: trimmedEmail, password });
       router.replace("/(tabs)");
     } catch (error) {
-      Alert.alert("登录失败", error instanceof Error ? error.message : "请稍后重试。");
+      Alert.alert(
+        t("auth.loginFailed"),
+        error instanceof Error ? error.message : t("auth.tryLater")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -70,11 +74,9 @@ export default function LoginScreen() {
       >
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            登录
+            {t("auth.login")}
           </ThemedText>
-          <ThemedText type="secondary">
-            使用 deepseek-chat-api 账号登录，同步你的对话与设置。
-          </ThemedText>
+          <ThemedText type="secondary">{t("auth.loginSubtitle")}</ThemedText>
         </View>
 
         <View
@@ -84,17 +86,17 @@ export default function LoginScreen() {
           ]}
         >
           <AuthFormField
-            label="邮箱"
+            label={t("auth.email")}
             value={email}
             onChangeText={setEmail}
             placeholder="you@example.com"
             keyboardType="email-address"
           />
           <AuthFormField
-            label="密码"
+            label={t("auth.password")}
             value={password}
             onChangeText={setPassword}
-            placeholder="请输入密码"
+            placeholder={t("auth.passwordPlaceholder")}
             secureTextEntry
             showToggle
             isVisible={isPasswordVisible}
@@ -107,22 +109,25 @@ export default function LoginScreen() {
             onPress={() => void handleLogin()}
             style={({ pressed }) => [
               styles.primaryButton,
+              { backgroundColor: theme.primary },
               (pressed || isSubmitting) && styles.pressed,
             ]}
           >
             {isSubmitting ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={theme.onPrimary} />
             ) : (
-              <ThemedText style={styles.primaryButtonText}>登录</ThemedText>
+              <ThemedText style={[styles.primaryButtonText, { color: theme.onPrimary }]}>
+                {t("auth.login")}
+              </ThemedText>
             )}
           </Pressable>
         </View>
 
         <View style={styles.footer}>
-          <ThemedText type="secondary">还没有账号？</ThemedText>
+          <ThemedText type="secondary">{t("auth.noAccount")}</ThemedText>
           <Link href="/(auth)/register" asChild>
             <Pressable accessibilityRole="link">
-              <ThemedText type="link">立即注册</ThemedText>
+              <ThemedText type="link">{t("auth.registerNow")}</ThemedText>
             </Pressable>
           </Link>
         </View>
@@ -131,12 +136,12 @@ export default function LoginScreen() {
           accessibilityRole="button"
           onPress={() => {
             enterGuestMode();
-            router.replace("/(tabs)/explore");
+            router.replace("/(tabs)");
           }}
           style={({ pressed }) => [styles.guestButton, pressed && styles.pressed]}
         >
           <ThemedText type="secondary" style={styles.guestButtonText}>
-            跳过登录，直接进入 Chat（临时）
+            {t("auth.skipGuest")}
           </ThemedText>
         </Pressable>
       </ScrollView>
@@ -165,7 +170,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryButton: {
-    backgroundColor: Colors.primary,
     borderRadius: 14,
     minHeight: 48,
     alignItems: "center",
@@ -173,7 +177,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   primaryButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "700",
   },

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "DeepSeek Chat",
+    "name": "Minibot",
     "slug": "deepseek-chat",
     "version": "1.0.2",
     "orientation": "portrait",
@@ -13,7 +13,7 @@
       "bundleIdentifier": "com.liuyidi.deepseekchat",
       "buildNumber": "3",
       "infoPlist": {
-        "CFBundleDisplayName": "DeepSeek Chat",
+        "CFBundleDisplayName": "Minibot",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -22,7 +22,7 @@
       "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#1063FD"
+        "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
@@ -47,7 +47,9 @@
       "typedRoutes": true
     },
     "extra": {
-      "chatApiBaseUrl": "http://127.0.0.1:8000"
+      "chatApiBaseUrl": "http://127.0.0.1:8000",
+      "minibotBaseUrl": "https://bot.liuyidi.me",
+      "minibotAuthSecret": ""
     }
   }
 }

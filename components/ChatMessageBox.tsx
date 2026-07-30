@@ -1,9 +1,11 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { Reply } from 'lucide-react-native';
 import { IMessage, Message, MessageProps } from 'react-native-gifted-chat';
 import { isSameDay, isSameUser } from 'react-native-gifted-chat/lib/utils';
+
+import { AppIcon } from '@/components/ui/AppIcon';
 import {Colors} from '@/constants/Colors';
 
 type ChatMessageBoxProps = {
@@ -37,7 +39,7 @@ const ChatMessageBox = ({ setReplyOnSwipeOpen, updateRowRef, ...props }: ChatMes
           props.position === 'right' && styles.leftOffsetValue,
         ]}>
         <View style={styles.replyImageWrapper}>
-          <MaterialCommunityIcons name="reply-circle" size={26} color={Colors.gray} />
+          <AppIcon icon={Reply} size={26} color={Colors.gray} />
         </View>
       </Animated.View>
     );

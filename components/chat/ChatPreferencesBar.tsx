@@ -1,3 +1,4 @@
+import { Box, Lightbulb, Zap } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -6,15 +7,12 @@ import {
   type ChatDropdownOption,
 } from "@/components/chat/ChatPreferenceDropdown";
 import { useChatPreferences } from "@/context/ChatPreferencesContext";
+import { useT } from "@/context/LanguageContext";
 import { MODEL_LABELS, MODEL_OPTIONS } from "@/lib/modelLabels";
 import type { DeepSeekModelId } from "@/lib/chatPreferencesConfig";
 
-const THINKING_OPTIONS: ChatDropdownOption<boolean>[] = [
-  { value: false, label: "关闭", icon: "flash-outline" },
-  { value: true, label: "开启", icon: "bulb-outline" },
-];
-
 export function ChatPreferencesBar() {
+  const t = useT();
   const {
     model,
     setModel,
@@ -26,14 +24,20 @@ export function ChatPreferencesBar() {
 
   const isReasonerModel = model === "deepseek-reasoner";
 
-  const thinkingOptions = useMemo(
-    () =>
-      THINKING_OPTIONS.map((option) => ({
-        ...option,
-        disabled: isReasonerModel && !option.value,
-      })),
-    [isReasonerModel]
-  );
+  const thinkingOptions = useMemo((): ChatDropdownOption<boolean>[] => {
+    const options: ChatDropdownOption<boolean>[] = [
+      { value: false, label: t("common.off"), icon: Zap },
+      { value: true, label: t("common.on"), icon: Lightbulb },
+    ];
+    return options.map((option) => ({
+      ...option,
+      disabled: isReasonerModel && !option.value,
+    }));
+  }, [isReasonerModel, t]);
+
+  const thinkingLabel = t("prefs.thinkingLabel", {
+    state: isThinkingActive ? t("prefs.onShort") : t("prefs.offShort"),
+  });
 
   return (
     <View style={styles.row}>
@@ -41,8 +45,8 @@ export function ChatPreferencesBar() {
         menuId="model"
         activeMenuId={activeMenuId}
         onMenuChange={setActiveMenuId}
-        icon="cube-outline"
-        activeIcon="cube"
+        icon={Box}
+        activeIcon={Box}
         label={MODEL_LABELS[model]}
         options={MODEL_OPTIONS.map((option) => ({
           value: option.value,
@@ -57,9 +61,9 @@ export function ChatPreferencesBar() {
         menuId="thinking"
         activeMenuId={activeMenuId}
         onMenuChange={setActiveMenuId}
-        icon={isThinkingActive ? "bulb" : "bulb-outline"}
-        activeIcon="bulb"
-        label={`思考 ${isThinkingActive ? "开" : "关"}`}
+        icon={Lightbulb}
+        activeIcon={Lightbulb}
+        label={thinkingLabel}
         options={thinkingOptions}
         selected={isReasonerModel ? true : thinkingEnabled}
         onSelect={setThinkingEnabled}

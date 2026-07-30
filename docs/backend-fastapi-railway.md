@@ -1,7 +1,16 @@
 # 后端接入（FastAPI + Railway）
 
+> **已废弃（2026-07-30）**  
+> 产品后端改为对接 sibling **minibot** FastAPI server（`:8766`），不再自建 Railway 聊天后端。  
+> 现行路线图：[minibot-mobile-roadmap.md](./minibot-mobile-roadmap.md)。  
+> 下文仅作历史参考，勿按此实现。
+
+---
+
+# 后端接入（FastAPI + Railway）— 历史稿
+
 > 规划说明，不含实现代码。  
-> 更新时间：2026-07-05
+> 更新时间：2026-07-05（原文）
 
 ---
 

@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import {
   DEFAULT_PROFILE,
@@ -23,9 +23,18 @@ import {
   type UserProfile,
 } from "@/lib/userProfileConfig";
 
-const AVATAR_COLORS = ["#1063FD", "#34C759", "#FF9500", "#AF52DE", "#FF3B30"];
+const AVATAR_COLORS = [
+  "#1A1C1F",
+  "#C96442",
+  "#6B7280",
+  "#40C977",
+  "#D29922",
+  "#AD7BF9",
+  "#FA423E",
+];
 
 export default function ProfileSettingsScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
@@ -40,7 +49,7 @@ export default function ProfileSettingsScreen() {
   const handleSave = async () => {
     const nickname = profile.nickname.trim();
     if (!nickname) {
-      Alert.alert("请输入昵称", "昵称不能为空。");
+      Alert.alert(t("profile.emptyNicknameTitle"), t("profile.emptyNicknameBody"));
       return;
     }
 
@@ -53,9 +62,9 @@ export default function ProfileSettingsScreen() {
       };
       await setUserProfile(nextProfile);
       setProfile(nextProfile);
-      Alert.alert("保存成功", "个人信息已更新。");
+      Alert.alert(t("profile.saveSuccessTitle"), t("profile.saveSuccessBody"));
     } catch {
-      Alert.alert("保存失败", "请稍后重试。");
+      Alert.alert(t("profile.saveFailTitle"), t("profile.saveFailBody"));
     } finally {
       setIsSaving(false);
     }
@@ -80,7 +89,7 @@ export default function ProfileSettingsScreen() {
               {getProfileInitial(profile.nickname)}
             </ThemedText>
           </View>
-          <ThemedText type="secondary">选择头像颜色</ThemedText>
+          <ThemedText type="secondary">{t("profile.avatarColor")}</ThemedText>
           <View style={styles.colorRow}>
             {AVATAR_COLORS.map((color) => {
               const selected = profile.avatarColor === color;
@@ -107,11 +116,11 @@ export default function ProfileSettingsScreen() {
             { backgroundColor: theme.card, borderColor: theme.border },
           ]}
         >
-          <ThemedText type="defaultSemiBold">昵称</ThemedText>
+          <ThemedText type="defaultSemiBold">{t("profile.nickname")}</ThemedText>
           <TextInput
             value={profile.nickname}
             onChangeText={(nickname) => setProfile((current) => ({ ...current, nickname }))}
-            placeholder="输入昵称"
+            placeholder={t("profile.nicknamePlaceholder")}
             placeholderTextColor={theme.textSecondary}
             style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
@@ -123,11 +132,11 @@ export default function ProfileSettingsScreen() {
             { backgroundColor: theme.card, borderColor: theme.border },
           ]}
         >
-          <ThemedText type="defaultSemiBold">个人描述</ThemedText>
+          <ThemedText type="defaultSemiBold">{t("profile.bio")}</ThemedText>
           <TextInput
             value={profile.bio}
             onChangeText={(bio) => setProfile((current) => ({ ...current, bio }))}
-            placeholder="介绍一下自己"
+            placeholder={t("profile.bioPlaceholder")}
             placeholderTextColor={theme.textSecondary}
             multiline
             textAlignVertical="top"
@@ -144,11 +153,12 @@ export default function ProfileSettingsScreen() {
           onPress={() => void handleSave()}
           style={({ pressed }) => [
             styles.saveButton,
+            { backgroundColor: theme.primary },
             (pressed || isSaving) && styles.pressed,
           ]}
         >
           <ThemedText style={styles.saveButtonText}>
-            {isSaving ? "保存中..." : "保存"}
+            {isSaving ? t("profile.saving") : t("common.save")}
           </ThemedText>
         </Pressable>
       </ScrollView>
@@ -222,7 +232,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   saveButton: {
-    backgroundColor: Colors.primary,
     borderRadius: 14,
     minHeight: 48,
     alignItems: "center",

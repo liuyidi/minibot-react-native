@@ -1,32 +1,16 @@
-import { SymbolView, SymbolViewProps, SymbolWeight } from 'expo-symbols';
-import { StyleProp, ViewStyle } from 'react-native';
+/**
+ * @deprecated Prefer AppIcon + lucide-react-native.
+ */
+export type IconSymbolName = string;
 
-export function IconSymbol({
-  name,
-  size = 24,
-  color,
-  style,
-  weight = 'regular',
-}: {
-  name: SymbolViewProps['name'];
+export function IconSymbol(_props: {
+  name: IconSymbolName;
   size?: number;
-  color: string;
-  style?: StyleProp<ViewStyle>;
-  weight?: SymbolWeight;
-}) {
-  return (
-    <SymbolView
-      weight={weight}
-      tintColor={color}
-      resizeMode="scaleAspectFit"
-      name={name}
-      style={[
-        {
-          width: size,
-          height: size,
-        },
-        style,
-      ]}
-    />
-  );
+  color?: string;
+  style?: unknown;
+}): null {
+  if (__DEV__) {
+    console.warn("IconSymbol is deprecated; use AppIcon from @/components/ui/AppIcon");
+  }
+  return null;
 }

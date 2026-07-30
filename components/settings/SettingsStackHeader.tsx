@@ -1,9 +1,11 @@
 import type { NativeStackHeaderProps } from "@react-navigation/native-stack";
-import { Ionicons } from "@expo/vector-icons";
+import { ChevronLeft } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { ThemedText } from "@/components/ThemedText";
+import { useLanguage } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 function SettingsStackHeaderComponent({
@@ -13,6 +15,7 @@ function SettingsStackHeaderComponent({
 }: NativeStackHeaderProps) {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
+  const { t } = useLanguage();
   const title = typeof options.title === "string" ? options.title : route.name;
 
   return (
@@ -29,12 +32,12 @@ function SettingsStackHeaderComponent({
       <View style={styles.bar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="返回"
+          accessibilityLabel={t("common.back")}
           hitSlop={12}
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Ionicons name="chevron-back" size={24} color={theme.text} />
+          <AppIcon icon={ChevronLeft} size={24} color={theme.text} />
         </Pressable>
         <ThemedText style={styles.title}>{title}</ThemedText>
       </View>

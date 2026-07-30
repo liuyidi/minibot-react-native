@@ -8,6 +8,9 @@ import {
   type ReactNode,
 } from "react";
 
+import { createTranslator, type TranslateFn } from "@/lib/i18n";
+import { getCatalog } from "@/lib/i18n";
+import type { MessageCatalog } from "@/lib/i18n/messages";
 import {
   getAppLanguage,
   setAppLanguage as persistAppLanguage,
@@ -17,6 +20,8 @@ import {
 type LanguageContextValue = {
   language: AppLanguage;
   setLanguage: (language: AppLanguage) => Promise<void>;
+  t: TranslateFn;
+  catalog: MessageCatalog;
   isReady: boolean;
 };
 
@@ -38,13 +43,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     await persistAppLanguage(nextLanguage);
   }, []);
 
+  const t = useMemo(() => createTranslator(language), [language]);
+  const catalog = useMemo(() => getCatalog(language), [language]);
+
   const value = useMemo(
     () => ({
       language,
       setLanguage,
+      t,
+      catalog,
       isReady,
     }),
-    [isReady, language, setLanguage]
+    [catalog, isReady, language, setLanguage, t]
   );
 
   return (
@@ -58,4 +68,9 @@ export function useLanguage() {
     throw new Error("useLanguage must be used within LanguageProvider");
   }
   return context;
+}
+
+/** Shorthand for `useLanguage().t`. */
+export function useT(): TranslateFn {
+  return useLanguage().t;
 }

@@ -2,21 +2,21 @@
  * Resolve a themed color by name, with optional light/dark overrides.
  */
 
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAppearance } from "@/context/AppearanceContext";
+import type { ThemePalette } from "@/lib/theme/types";
 
-type ThemeColorName = keyof typeof Colors.light & keyof typeof Colors.dark;
+type ThemeColorName = keyof ThemePalette;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: ThemeColorName
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const { colorScheme, palette } = useAppearance();
+  const colorFromProps = props[colorScheme];
 
   if (colorFromProps) {
     return colorFromProps;
   }
 
-  return Colors[theme][colorName];
+  return palette[colorName];
 }

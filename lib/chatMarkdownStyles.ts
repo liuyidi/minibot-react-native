@@ -1,7 +1,7 @@
 import { Platform, StyleSheet, type TextStyle, type ViewStyle } from "react-native";
 import type { MarkdownProps } from "react-native-markdown-display";
 
-import { Colors, type AppColorScheme, type ThemeColors } from "@/constants/Colors";
+import { type AppColorScheme, type ThemePalette } from "@/lib/theme/types";
 
 type MarkdownStyles = NonNullable<MarkdownProps["style"]>;
 
@@ -10,21 +10,16 @@ function fontWeightSemibold(): TextStyle["fontWeight"] {
 }
 
 export function createChatMarkdownStyles(
-  theme: ThemeColors,
+  theme: ThemePalette,
   colorScheme: AppColorScheme,
   position: "left" | "right"
 ): MarkdownStyles {
-  const textColor =
-    position === "right"
-      ? colorScheme === "dark"
-        ? "#EBEBF5"
-        : "#1C1C1E"
-      : theme.text;
+  const textColor = theme.text;
 
   const codeBackground =
-    colorScheme === "dark" ? "#2C2C2E" : position === "right" ? "#D6E4FF" : "#F4F4F5";
+    colorScheme === "dark" ? "#2D2D2D" : "#F4F4F4";
 
-  const blockquoteBorder = position === "right" ? Colors.primary : theme.border;
+  const blockquoteBorder = theme.border;
 
   return {
     body: {
@@ -91,7 +86,8 @@ export function createChatMarkdownStyles(
       fontStyle: "italic",
     },
     link: {
-      color: position === "right" ? (colorScheme === "dark" ? "#A8C7FF" : Colors.primary) : theme.link,
+      color: theme.link,
+      textDecorationLine: "underline",
     },
     blockquote: {
       backgroundColor: "transparent",

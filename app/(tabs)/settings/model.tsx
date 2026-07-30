@@ -1,16 +1,18 @@
-import { Ionicons } from "@expo/vector-icons";
+import { CircleCheck } from "lucide-react-native";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
 import { useChatPreferences } from "@/context/ChatPreferencesContext";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { MODEL_OPTIONS } from "@/lib/modelLabels";
 
 export default function ModelSettingsScreen() {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
+  const t = useT();
   const { model, setModel } = useChatPreferences();
 
   return (
@@ -23,7 +25,7 @@ export default function ModelSettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <ThemedText type="secondary" style={styles.hint}>
-        选择聊天使用的 DeepSeek 模型。V4 系列为当前推荐模型。
+        {t("model.hint")}
       </ThemedText>
 
       <View
@@ -57,17 +59,17 @@ export default function ModelSettingsScreen() {
                   { backgroundColor: theme.background },
                 ]}
               >
-                <Ionicons
-                  name={option.icon}
+                <AppIcon
+                  icon={option.icon}
                   size={20}
-                  color={isSelected ? Colors.primary : theme.textSecondary}
+                  color={isSelected ? theme.primary : theme.textSecondary}
                 />
               </View>
               <ThemedText type="defaultSemiBold" style={styles.optionLabel}>
                 {option.label}
               </ThemedText>
               {isSelected ? (
-                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
+                <AppIcon icon={CircleCheck} size={22} color={theme.primary} />
               ) : (
                 <View
                   style={[styles.radioOuter, { borderColor: theme.border }]}

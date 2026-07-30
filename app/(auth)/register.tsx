@@ -14,13 +14,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AuthFormField } from "@/components/auth/AuthFormField";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function RegisterScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { register, isAuthenticated, isReady } = useAuth();
@@ -40,15 +41,15 @@ export default function RegisterScreen() {
     const trimmedNickname = nickname.trim();
 
     if (!EMAIL_PATTERN.test(trimmedEmail)) {
-      Alert.alert("邮箱格式有误", "请输入有效的邮箱地址。");
+      Alert.alert(t("auth.invalidEmailTitle"), t("auth.invalidEmailBody"));
       return;
     }
     if (password.length < 8) {
-      Alert.alert("密码太短", "密码至少需要 8 个字符。");
+      Alert.alert(t("auth.passwordTooShortTitle"), t("auth.passwordTooShortBody"));
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert("密码不一致", "两次输入的密码不一致。");
+      Alert.alert(t("auth.passwordMismatchTitle"), t("auth.passwordMismatchBody"));
       return;
     }
 
@@ -61,7 +62,10 @@ export default function RegisterScreen() {
       });
       router.replace("/(tabs)");
     } catch (error) {
-      Alert.alert("注册失败", error instanceof Error ? error.message : "请稍后重试。");
+      Alert.alert(
+        t("auth.registerFailed"),
+        error instanceof Error ? error.message : t("auth.tryLater")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -82,11 +86,9 @@ export default function RegisterScreen() {
       >
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            注册
+            {t("auth.register")}
           </ThemedText>
-          <ThemedText type="secondary">
-            创建账号后即可登录 DeepSeek Chat，后续可同步会话到云端。
-          </ThemedText>
+          <ThemedText type="secondary">{t("auth.registerSubtitle")}</ThemedText>
         </View>
 
         <View
@@ -96,35 +98,35 @@ export default function RegisterScreen() {
           ]}
         >
           <AuthFormField
-            label="邮箱"
+            label={t("auth.email")}
             value={email}
             onChangeText={setEmail}
             placeholder="you@example.com"
             keyboardType="email-address"
           />
           <AuthFormField
-            label="昵称（可选）"
+            label={t("auth.nicknameOptional")}
             value={nickname}
             onChangeText={setNickname}
-            placeholder="DeepSeek 用户"
+            placeholder={t("me.defaultName")}
             autoCapitalize="words"
             autoCorrect={false}
           />
           <AuthFormField
-            label="密码"
+            label={t("auth.password")}
             value={password}
             onChangeText={setPassword}
-            placeholder="至少 8 位"
+            placeholder={t("auth.passwordHint")}
             secureTextEntry
             showToggle
             isVisible={isPasswordVisible}
             onToggleVisibility={() => setIsPasswordVisible((current) => !current)}
           />
           <AuthFormField
-            label="确认密码"
+            label={t("auth.confirmPassword")}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            placeholder="再次输入密码"
+            placeholder={t("auth.confirmPasswordPlaceholder")}
             secureTextEntry
             showToggle
             isVisible={isPasswordVisible}
@@ -137,22 +139,25 @@ export default function RegisterScreen() {
             onPress={() => void handleRegister()}
             style={({ pressed }) => [
               styles.primaryButton,
+              { backgroundColor: theme.primary },
               (pressed || isSubmitting) && styles.pressed,
             ]}
           >
             {isSubmitting ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={theme.onPrimary} />
             ) : (
-              <ThemedText style={styles.primaryButtonText}>注册</ThemedText>
+              <ThemedText style={[styles.primaryButtonText, { color: theme.onPrimary }]}>
+                {t("auth.register")}
+              </ThemedText>
             )}
           </Pressable>
         </View>
 
         <View style={styles.footer}>
-          <ThemedText type="secondary">已有账号？</ThemedText>
+          <ThemedText type="secondary">{t("auth.hasAccount")}</ThemedText>
           <Link href="/(auth)/login" asChild>
             <Pressable accessibilityRole="link">
-              <ThemedText type="link">去登录</ThemedText>
+              <ThemedText type="link">{t("auth.goLogin")}</ThemedText>
             </Pressable>
           </Link>
         </View>
@@ -182,7 +187,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryButton: {
-    backgroundColor: Colors.primary,
     borderRadius: 14,
     minHeight: 48,
     alignItems: "center",
@@ -190,7 +194,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   primaryButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "700",
   },

@@ -1,13 +1,15 @@
-import { Ionicons } from "@expo/vector-icons";
+import type { LucideIcon } from "lucide-react-native";
+import { ChevronRight } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
+import { AppIcon } from "@/components/ui/AppIcon";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 type SettingsNavRowProps = {
   title: string;
   value?: string;
-  icon?: keyof typeof Ionicons.glyphMap;
+  icon?: LucideIcon;
   showDivider?: boolean;
   destructive?: boolean;
   onPress?: () => void;
@@ -23,6 +25,35 @@ export function SettingsNavRow({
 }: SettingsNavRowProps) {
   const theme = useAppTheme();
 
+  const content = (
+    <>
+      {icon ? (
+        <AppIcon
+          icon={icon}
+          size={20}
+          color={destructive ? theme.red : theme.textSecondary}
+        />
+      ) : null}
+      <ThemedText
+        type="defaultSemiBold"
+        numberOfLines={1}
+        style={[styles.title, destructive ? { color: theme.red } : undefined]}
+      >
+        {title}
+      </ThemedText>
+      <View style={styles.trailing}>
+        {value ? (
+          <ThemedText type="secondary" numberOfLines={1} style={styles.value}>
+            {value}
+          </ThemedText>
+        ) : null}
+        {onPress && !destructive ? (
+          <AppIcon icon={ChevronRight} size={18} color={theme.textSecondary} />
+        ) : null}
+      </View>
+    </>
+  );
+
   if (!onPress) {
     return (
       <View
@@ -34,21 +65,7 @@ export function SettingsNavRow({
           },
         ]}
       >
-        {icon ? (
-          <View style={[styles.iconWrap, { backgroundColor: theme.background }]}>
-            <Ionicons name={icon} size={18} color={theme.textSecondary} />
-          </View>
-        ) : null}
-        <ThemedText type="defaultSemiBold" numberOfLines={1} style={styles.title}>
-          {title}
-        </ThemedText>
-        <View style={styles.trailing}>
-          {value ? (
-            <ThemedText type="secondary" numberOfLines={1} style={styles.value}>
-              {value}
-            </ThemedText>
-          ) : null}
-        </View>
+        {content}
       </View>
     );
   }
@@ -66,30 +83,7 @@ export function SettingsNavRow({
         pressed ? styles.pressed : undefined,
       ]}
     >
-      {icon ? (
-        <View style={[styles.iconWrap, { backgroundColor: theme.background }]}>
-          <Ionicons
-            name={icon}
-            size={18}
-            color={destructive ? "#EF0827" : theme.textSecondary}
-          />
-        </View>
-      ) : null}
-      <ThemedText
-        type="defaultSemiBold"
-        numberOfLines={1}
-        style={[styles.title, destructive ? styles.destructiveText : undefined]}
-      >
-        {title}
-      </ThemedText>
-      <View style={styles.trailing}>
-        {value ? (
-          <ThemedText type="secondary" numberOfLines={1} style={styles.value}>
-            {value}
-          </ThemedText>
-        ) : null}
-        <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
-      </View>
+      {content}
     </Pressable>
   );
 }
@@ -100,15 +94,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 48,
-  },
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: 14,
+    minHeight: 52,
   },
   title: {
     flex: 1,
@@ -117,16 +104,14 @@ const styles = StyleSheet.create({
   trailing: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
     flexShrink: 1,
-    maxWidth: "50%",
+    maxWidth: "48%",
   },
   value: {
     flexShrink: 1,
     textAlign: "right",
-  },
-  destructiveText: {
-    color: "#EF0827",
+    fontSize: 15,
   },
   pressed: {
     opacity: 0.72,

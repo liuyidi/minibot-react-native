@@ -1,3 +1,5 @@
+import { Smartphone, Sun, Moon, type LucideIcon } from "lucide-react-native";
+
 import type { AppearanceMode } from "@/lib/appearanceConfig";
 
 export const APPEARANCE_LABELS: Record<AppearanceMode, string> = {
@@ -10,24 +12,24 @@ export const APPEARANCE_OPTIONS: {
   value: AppearanceMode;
   label: string;
   description: string;
-  icon: "phone-portrait-outline" | "sunny-outline" | "moon-outline";
+  icon: LucideIcon;
 }[] = [
   {
     value: "system",
     label: "系统",
     description: "跟随系统深浅色设置",
-    icon: "phone-portrait-outline",
+    icon: Smartphone,
   },
   {
     value: "light",
     label: "浅色",
     description: "始终使用浅色界面",
-    icon: "sunny-outline",
+    icon: Sun,
   },
   {
     value: "dark",
     label: "深色",
     description: "始终使用深色界面",
-    icon: "moon-outline",
+    icon: Moon,
   },
 ];

@@ -1,8 +1,10 @@
-import {Colors} from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { CircleX } from 'lucide-react-native';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { IMessage } from 'react-native-gifted-chat';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+
+import { AppIcon } from '@/components/ui/AppIcon';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 type ReplyMessageBarProps = {
   clearReply: () => void;
@@ -10,6 +12,8 @@ type ReplyMessageBarProps = {
 };
 
 const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
+  const theme = useAppTheme();
+
   return (
     <>
       {message !== null && (
@@ -29,14 +33,14 @@ const ReplyMessageBar = ({ clearReply, message }: ReplyMessageBarProps) => {
               }}>
               {message?.user.name}
             </Text>
-            <Text style={{ color: Colors.gray, paddingLeft: 10, paddingTop: 5 }}>
+            <Text style={{ color: theme.gray, paddingLeft: 10, paddingTop: 5 }}>
               {message!.text.length > 40 ? message?.text.substring(0, 40) + '...' : message?.text}
             </Text>
           </View>
           <View
             style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end', paddingRight: 10 }}>
             <TouchableOpacity onPress={clearReply}>
-              <Ionicons name="close-circle-outline" color={Colors.primary} size={28} />
+              <AppIcon icon={CircleX} color={theme.primary} size={28} />
             </TouchableOpacity>
           </View>
         </Animated.View>

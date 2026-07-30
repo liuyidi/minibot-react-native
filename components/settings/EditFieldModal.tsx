@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
 type EditFieldModalProps = {
@@ -32,6 +32,7 @@ export function EditFieldModal({
   onClose,
   onSave,
 }: EditFieldModalProps) {
+  const t = useT();
   const theme = useAppTheme();
   const [draft, setDraft] = useState(value);
 
@@ -71,14 +72,16 @@ export function EditFieldModal({
           />
           <View style={styles.actions}>
             <Pressable accessibilityRole="button" onPress={onClose} style={styles.actionButton}>
-              <ThemedText type="secondary">取消</ThemedText>
+              <ThemedText type="secondary">{t("common.cancel")}</ThemedText>
             </Pressable>
             <Pressable
               accessibilityRole="button"
               onPress={() => onSave(draft.trim())}
               style={[styles.actionButton, styles.saveButton]}
             >
-              <ThemedText style={styles.saveText}>保存</ThemedText>
+              <ThemedText style={[styles.saveText, { color: theme.primary }]}>
+                {t("common.save")}
+              </ThemedText>
             </Pressable>
           </View>
         </View>
@@ -127,7 +130,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveText: {
-    color: Colors.primary,
     fontWeight: "700",
     fontSize: 16,
   },

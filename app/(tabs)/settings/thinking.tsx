@@ -1,22 +1,28 @@
-import { Ionicons } from "@expo/vector-icons";
+import { CircleCheck, Lightbulb, Zap } from "lucide-react-native";
+import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppIcon } from "@/components/ui/AppIcon";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
 import { useChatPreferences } from "@/context/ChatPreferencesContext";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 
-const THINKING_OPTIONS = [
-  { value: false, label: "关闭", icon: "flash-outline" as const },
-  { value: true, label: "开启", icon: "bulb-outline" as const },
-];
-
 export default function ThinkingSettingsScreen() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { thinkingEnabled, setThinkingEnabled, model } = useChatPreferences();
   const isReasonerModel = model === "deepseek-reasoner";
+
+  const thinkingOptions = useMemo(
+    () => [
+      { value: false, label: t("common.off"), icon: Zap },
+      { value: true, label: t("common.on"), icon: Lightbulb },
+    ],
+    [t]
+  );
 
   return (
     <ScrollView
@@ -28,8 +34,7 @@ export default function ThinkingSettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <ThemedText type="secondary" style={styles.hint}>
-        开启后，模型会先输出思考过程，再给出最终回答。V4 模型默认开启思考，此处关闭后将不再展示思考过程。Reasoner
-        模型始终开启思考模式。
+        {t("thinking.hint")}
       </ThemedText>
 
       {isReasonerModel ? (
@@ -39,9 +44,7 @@ export default function ThinkingSettingsScreen() {
             { backgroundColor: theme.card, borderColor: theme.border },
           ]}
         >
-          <ThemedText type="secondary">
-            当前模型为 DeepSeek Reasoner，思考模式始终开启。
-          </ThemedText>
+          <ThemedText type="secondary">{t("thinking.reasonerLocked")}</ThemedText>
         </View>
       ) : null}
 
@@ -51,14 +54,14 @@ export default function ThinkingSettingsScreen() {
           { backgroundColor: theme.card, borderColor: theme.border },
         ]}
       >
-        {THINKING_OPTIONS.map((option, index) => {
+        {thinkingOptions.map((option, index) => {
           const isSelected = thinkingEnabled === option.value;
-          const isLast = index === THINKING_OPTIONS.length - 1;
+          const isLast = index === thinkingOptions.length - 1;
           const isDisabled = isReasonerModel && !option.value;
 
           return (
             <Pressable
-              key={option.label}
+              key={String(option.value)}
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected, disabled: isDisabled }}
               disabled={isDisabled}
@@ -78,17 +81,17 @@ export default function ThinkingSettingsScreen() {
                   { backgroundColor: theme.background },
                 ]}
               >
-                <Ionicons
-                  name={option.icon}
+                <AppIcon
+                  icon={option.icon}
                   size={20}
-                  color={isSelected ? Colors.primary : theme.textSecondary}
+                  color={isSelected ? theme.primary : theme.textSecondary}
                 />
               </View>
               <ThemedText type="defaultSemiBold" style={styles.optionLabel}>
                 {option.label}
               </ThemedText>
               {isSelected ? (
-                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
+                <AppIcon icon={CircleCheck} size={22} color={theme.primary} />
               ) : (
                 <View
                   style={[styles.radioOuter, { borderColor: theme.border }]}

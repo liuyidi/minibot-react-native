@@ -2,33 +2,32 @@ import { Redirect, Tabs, router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { BookOpen, Compass, MessageCircle, User } from 'lucide-react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { AppIcon } from '@/components/ui/AppIcon';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/context/AuthContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useLanguage } from '@/context/LanguageContext';
 import { useAppTheme } from '@/hooks/useAppTheme';
 
-const settingsTabOptions = {
-  title: '我的',
-  unmountOnBlur: true,
-  tabBarIcon: ({ color }: { color: string }) => (
-    <IconSymbol size={26} name="person.fill" color={color} />
-  ),
-} as BottomTabNavigationOptions;
-
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const theme = Colors[colorScheme];
-  const appTheme = useAppTheme();
+  const theme = useAppTheme();
+  const { t } = useLanguage();
   const { canAccessApp, isReady } = useAuth();
+
+  const settingsTabOptions = {
+    title: t('tabs.me'),
+    unmountOnBlur: true,
+    tabBarIcon: ({ color }: { color: string }) => (
+      <AppIcon icon={User} size={26} color={color} />
+    ),
+  } as BottomTabNavigationOptions;
 
   if (!isReady) {
     return (
-      <View style={[styles.loading, { backgroundColor: appTheme.background }]}>
-        <ActivityIndicator size="large" color={appTheme.text} />
+      <View style={[styles.loading, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.text} />
       </View>
     );
   }
@@ -40,8 +39,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: colorScheme === 'dark' ? '#D1D1D6' : '#3A3A3C',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarLabelStyle: styles.tabLabel,
         headerShown: false,
         tabBarButton: HapticTab,
@@ -59,19 +58,33 @@ export default function TabLayout() {
             borderTopColor: theme.border,
           },
         }),
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="house.fill" color={color} />,
+          title: t('tabs.chat'),
+          tabBarIcon: ({ color }) => (
+            <AppIcon icon={MessageCircle} size={26} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="knowledge"
         options={{
-          title: 'Chat',
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="paperplane.fill" color={color} />,
+          title: t('tabs.knowledge'),
+          tabBarIcon: ({ color }) => (
+            <AppIcon icon={BookOpen} size={26} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="discover"
+        options={{
+          title: t('tabs.discover'),
+          tabBarIcon: ({ color }) => (
+            <AppIcon icon={Compass} size={26} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

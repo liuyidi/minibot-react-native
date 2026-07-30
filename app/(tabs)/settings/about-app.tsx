@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ExternalLink } from "@/components/ExternalLink";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
+import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { getAppVersion } from "@/lib/appVersion";
 
@@ -12,6 +12,7 @@ const APP_VERSION = getAppVersion();
 export default function AboutAppScreen() {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
+  const t = useT();
 
   return (
     <ScrollView
@@ -28,28 +29,14 @@ export default function AboutAppScreen() {
           { backgroundColor: theme.card, borderColor: theme.border },
         ]}
       >
-        <View style={styles.logo}>
-          <ThemedText style={styles.logoText}>DS</ThemedText>
+        <View style={[styles.logo, { backgroundColor: theme.primary }]}>
+          <ThemedText style={styles.logoText}>MB</ThemedText>
         </View>
         <ThemedText type="title" style={styles.appName}>
-          DeepSeek Chat
+          Minibot
         </ThemedText>
-        <ThemedText type="secondary">Version {APP_VERSION}</ThemedText>
-      </View>
-
-      <View
-        style={[
-          styles.section,
-          { backgroundColor: theme.card, borderColor: theme.border },
-        ]}
-      >
-        <ThemedText type="defaultSemiBold">应用简介</ThemedText>
-        <ThemedText type="secondary" style={styles.paragraph}>
-          DeepSeek Chat 是一款基于 React Native（Expo）构建的 AI 对话应用，
-          接入 DeepSeek Chat API，支持 iOS、Android 与 Web 多端使用。
-        </ThemedText>
-        <ThemedText type="secondary" style={styles.paragraph}>
-          你的 API Key 与个人设置均保存在本机，不会上传至第三方服务器。
+        <ThemedText type="secondary">
+          {t("about.versionLabel", { version: APP_VERSION })}
         </ThemedText>
       </View>
 
@@ -59,12 +46,27 @@ export default function AboutAppScreen() {
           { backgroundColor: theme.card, borderColor: theme.border },
         ]}
       >
-        <ThemedText type="defaultSemiBold">相关链接</ThemedText>
-        <ExternalLink href="https://platform.deepseek.com/">
-          <ThemedText type="link">DeepSeek 开放平台 →</ThemedText>
+        <ThemedText type="defaultSemiBold">{t("about.introTitle")}</ThemedText>
+        <ThemedText type="secondary" style={styles.paragraph}>
+          {t("about.introBody1")}
+        </ThemedText>
+        <ThemedText type="secondary" style={styles.paragraph}>
+          {t("about.introBody2")}
+        </ThemedText>
+      </View>
+
+      <View
+        style={[
+          styles.section,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
+        <ThemedText type="defaultSemiBold">{t("about.linksTitle")}</ThemedText>
+        <ExternalLink href="https://github.com/liuyidi/minibot">
+          <ThemedText type="link">{t("about.repoLink")}</ThemedText>
         </ExternalLink>
-        <ExternalLink href="https://github.com/liuyidi/deepseek-react-native">
-          <ThemedText type="link">GitHub 开源仓库 →</ThemedText>
+        <ExternalLink href="https://github.com/liuyidi/minibot-react-native">
+          <ThemedText type="link">{t("about.githubLink")}</ThemedText>
         </ExternalLink>
       </View>
     </ScrollView>
@@ -91,7 +93,6 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 18,
-    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 4,

@@ -1,3 +1,5 @@
+import { Zap, Gem, MessageCircle, Lightbulb, type LucideIcon } from "lucide-react-native";
+
 import type { DeepSeekModelId } from "@/lib/chatPreferencesConfig";
 
 export const MODEL_LABELS: Record<DeepSeekModelId, string> = {
@@ -10,26 +12,26 @@ export const MODEL_LABELS: Record<DeepSeekModelId, string> = {
 export const MODEL_OPTIONS: {
   value: DeepSeekModelId;
   label: string;
-  icon: "flash-outline" | "diamond-outline" | "chatbubble-outline" | "bulb-outline";
+  icon: LucideIcon;
 }[] = [
   {
     value: "deepseek-v4-flash",
-    label: "DeepSeek V4 Flash",
-    icon: "flash-outline",
+    label: "V4 Flash",
+    icon: Zap,
   },
   {
     value: "deepseek-v4-pro",
-    label: "DeepSeek V4 Pro",
-    icon: "diamond-outline",
+    label: "V4 Pro",
+    icon: Gem,
   },
   {
     value: "deepseek-chat",
-    label: "DeepSeek Chat（兼容）",
-    icon: "chatbubble-outline",
+    label: "Chat（兼容）",
+    icon: MessageCircle,
   },
   {
     value: "deepseek-reasoner",
-    label: "DeepSeek Reasoner（兼容）",
-    icon: "bulb-outline",
+    label: "Reasoner（兼容）",
+    icon: Lightbulb,
   },
 ];
