@@ -92,10 +92,8 @@ export function MinibotProvider({ children }: { children: ReactNode }) {
             if (prop === "onerror") {
               const original = value;
               (target as Record<string, unknown>)[prop] = (e: unknown) => {
-                const message =
-                  e instanceof ErrorEvent
-                    ? `WebSocket error: ${e.message || "unknown"}`
-                    : "WebSocket error";
+                const ev = e as { message?: string; error?: Error };
+                const message = `WebSocket error: ${ev.message || ev.error?.message || "unknown"}`;
                 console.warn("[minibot ws] onerror", e);
                 setLastError(message);
                 (original as (e: unknown) => void)?.call(target, e);
