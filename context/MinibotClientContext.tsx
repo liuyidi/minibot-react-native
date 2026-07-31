@@ -70,6 +70,54 @@ export function MinibotProvider({ children }: { children: ReactNode }) {
       getSecret: () => secret || undefined,
       reconnect: true,
       debug: __DEV__,
+      // iOS / Expo Go WebSocket may be dropped without a User-Agent header.
+      // Wrap the native socket so we can capture onerror/onclose details.
+      socketFactory: (wsUrl: string) => {
+        if (__DEV__) {
+          console.log("[minibot ws] connecting to", wsUrl);
+        }
+        // React Native WebSocket accepts an optional third argument with headers.
+        const WS = WebSocket as unknown as new (
+          url: string,
+          protocols?: string | string[] | null,
+          options?: { headers?: Record<string, string> },
+        ) => WebSocket;
+        const ws = new WS(wsUrl, [], {
+          headers: {
+            "User-Agent": "Minibot/1.0.2 (React Native; iOS)",
+          },
+        });
+        return new Proxy(ws, {
+          set(target, prop, value) {
+            if (prop === "onerror") {
+              const original = value;
+              (target as Record<string, unknown>)[prop] = (e: unknown) => {
+                const message =
+                  e instanceof ErrorEvent
+                    ? `WebSocket error: ${e.message || "unknown"}`
+                    : "WebSocket error";
+                console.warn("[minibot ws] onerror", e);
+                setLastError(message);
+                (original as (e: unknown) => void)?.call(target, e);
+              };
+              return true;
+            }
+            if (prop === "onclose") {
+              const original = value;
+              (target as Record<string, unknown>)[prop] = (e: unknown) => {
+                const closeEv = e as CloseEvent | undefined;
+                const message = `WebSocket closed: ${closeEv?.code ?? "unknown"} ${closeEv?.reason ?? ""}`;
+                console.warn("[minibot ws] onclose", closeEv?.code, closeEv?.reason);
+                setLastError(message);
+                (original as (e: unknown) => void)?.call(target, e);
+              };
+              return true;
+            }
+            (target as Record<string, unknown>)[prop as string] = value;
+            return true;
+          },
+        }) as WebSocket;
+      },
     });
     clientRef.current = next;
     setClient(next);
