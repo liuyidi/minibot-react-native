@@ -2,7 +2,7 @@
 
 日期：2026-07-31  
 现象：真机 Safari 打开 `https://bot.liuyidi.me/ui/` 可正常聊天；Expo Go（SDK 54）连接同一网关时 WebSocket 报 `1006` / `OSStatus error -9806`。  
-结论：**不是 nginx/TLS 配置问题**；根因是 Expo Go 内置 React Native WebSocket（SocketRocket / NSStream）在较新 iOS 上会本地中止 WSS 握手。修复方式是 iOS 走隐藏 WebView（WebKit）桥接 WebSocket。
+结论：**不是 nginx/TLS 配置问题**；根因是 React Native iOS 的 SocketRocket（NSStream）在较新系统上本地中止 WSS 握手。Expo Go 只是把该原生栈打进二进制且无法替换。修复：iOS 用隐藏 WebView（WebKit）桥接 WebSocket。
 
 ---
 
@@ -74,11 +74,19 @@ WARN  [minibot ws] onclose 1006 The operation couldn’t be completed. (OSStatus
 
 因此服务器可以正常响应该 ClientHello；手机侧是 **本地中止**，不是 nginx 拒握手。
 
-### 3.5 客户端栈差异
+### 3.5 客户端栈差异：RN / SocketRocket vs Expo
 
-React Native iOS 原生实现（`RCTWebSocketModule.mm`）使用 **SocketRocket**（`NSStream` / SecureTransport），不是 Safari 的 WebKit，也不是普通 `fetch` 的 NSURLSession 数据任务。
+**主要是 React Native（SocketRocket）的问题，不是 Expo 单独搞坏的。**
 
-在较新的 iOS（本次环境含 iOS 18.x / CFNetwork 3860）上，该路径对 `wss://` 会出现本地 abort；WebKit WebSocket 正常。
+| 层级 | 角色 |
+|------|------|
+| **React Native iOS** | `RCTWebSocketModule.mm` 仍走 **SocketRocket**（`NSStream` / SecureTransport），不是 Safari/WebKit，也不是普通 `fetch` 的 NSURLSession，更不是 `URLSessionWebSocketTask`。本次依赖为 RN `0.81.5`（Expo SDK 54）。 |
+| **Expo Go** | 把上述原生模块打进 Expo Go 二进制；**JS 层没有另写一套坏掉的 WSS**。真正限制是：Expo Go 里**换不了**原生 WebSocket，只能 WebView 绕过或上 Dev Client。 |
+| **是否“已知版本 bug”** | SocketRocket **有**公开 TLS 相关坑（尤其历史上对 TLS 1.3 支持差）。本次是 **TLS 1.2 ClientHello 发出后本地立刻 RST**，与“服务器只开 TLS 1.3”不完全同型，更像 **SocketRocket × 较新 iOS SecureTransport** 兼容问题。未找到与「ClientHello 后约 0.02ms RST + Safari 正常」完全对得上的官方 issue 编号，不宜写成已确认的某版本 CVE。 |
+
+推论：同一 RN 版本的裸工程 / EAS 正式包，若仍用原生 `WebSocket`，**很可能同样挂**；Expo 的锅主要是 **Expo Go 没法打原生补丁**。
+
+在较新的 iOS（本次环境含 iOS 18.x / CFNetwork 3860）上，SocketRocket 路径对 `wss://` 会本地 abort；**同一设备上 WebKit WebSocket（Safari / WKWebView）正常**。
 
 ---
 
@@ -99,6 +107,73 @@ React Native iOS 原生实现（`RCTWebSocketModule.mm`）使用 **SocketRocket*
 [minibot ws] status open
 ```
 
+### 4.1 WebView WebSocket 桥接流程
+
+思路：JS 侧假装自己是 `WebSocket`；真正的 `new WebSocket(wssUrl)` 跑在隐藏 `WKWebView` 里（与 Safari 同一 WebKit 栈）；两侧用 `injectJavaScript` / `postMessage` 传命令与事件。
+
+```mermaid
+flowchart TB
+  subgraph App["React Native App (iOS)"]
+    CTX["MinibotClientContext<br/>socketFactory = createIosWebSocket"]
+    SHIM["WebViewWebSocket shim<br/>API 兼容: onopen / send / onmessage / close"]
+    HOST["WebViewWebSocketHost<br/>1×1 隐藏 WebView"]
+    CTX --> SHIM
+    CTX --> HOST
+  end
+
+  subgraph Bridge["桥接通道"]
+    CMD["RN → WebView<br/>injectJavaScript<br/>__minibotHandle(connect/send/close)"]
+    EVT["WebView → RN<br/>ReactNativeWebView.postMessage<br/>ready / open / message / error / close"]
+  end
+
+  subgraph WK["WKWebView (WebKit)"]
+    HTML["内嵌 HTML + JS 桥"]
+    REAL["浏览器原生 WebSocket<br/>new WebSocket(wssUrl)"]
+    HTML --> REAL
+  end
+
+  SERVER["bot.liuyidi.me<br/>wss://.../ws?token=..."]
+
+  SHIM -->|enqueue connect/send/close| CMD
+  CMD --> HTML
+  REAL <-->|TLS + WS 握手与帧| SERVER
+  REAL -->|onopen / onmessage / onclose| HTML
+  HTML -->|postMessage| EVT
+  EVT --> SHIM
+  SHIM -->|回调给 @minibot/client| CTX
+```
+
+连接时序（简化）：
+
+```mermaid
+sequenceDiagram
+  participant C as MinibotClient
+  participant S as WebViewWebSocket shim
+  participant H as WebViewWebSocketHost
+  participant W as WKWebView WebSocket
+  participant N as bot.liuyidi.me
+
+  C->>S: new WebViewWebSocket(wssUrl)
+  S->>S: waitUntilReady()
+  H-->>S: postMessage {type: ready}
+  S->>H: injectJavaScript connect {id, url}
+  H->>W: new WebSocket(url)
+  W->>N: TLS + HTTP Upgrade
+  N-->>W: 101 Switching Protocols
+  W-->>H: onopen
+  H-->>S: postMessage {type: open, id}
+  S-->>C: onopen / status open
+
+  C->>S: send(JSON frame)
+  S->>H: injectJavaScript send {id, data}
+  H->>W: ws.send(data)
+  W->>N: WS frame
+  N-->>W: WS frame
+  W-->>H: onmessage
+  H-->>S: postMessage {type: message, id, data}
+  S-->>C: onmessage
+```
+
 ---
 
 ## 5. 以后再排查同类问题的清单
@@ -107,7 +182,7 @@ React Native iOS 原生实现（`RCTWebSocketModule.mm`）使用 **SocketRocket*
 2. **若 HTTPS 通、WSS 无 access 记录**：优先怀疑客户端 TLS/WebSocket 实现，而不是再改一圈证书。  
 3. **抓包**：看 ClientHello 之后是 ServerHello 还是客户端 RST。  
 4. **确认 RN iOS 仍是 SocketRocket**：不要默认当成 `URLSessionWebSocketTask`。  
-5. **Expo Go 无法替换原生 WS 实现**：绕过手段是 WebKit 桥、自定义 Dev Client，或改用非 WS 传输。
+5. **区分 RN vs Expo**：根因在 RN/SocketRocket；Expo Go 只是无法替换原生模块。绕过手段是 WebKit 桥、自定义 Dev Client，或改用非 WS 传输。
 
 ---
 
