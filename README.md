@@ -129,6 +129,7 @@ docs/
 | 文档 | 说明 |
 |------|------|
 | [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md) | 与 minibot / webui 的差距与分阶段计划 |
+| [docs/expo-go-ios-wss-debugging.md](./docs/expo-go-ios-wss-debugging.md) | Expo Go iOS WSS 失败排查（SocketRocket vs WebKit） |
 | [docs/TODO.md](./docs/TODO.md) | 待办总览 |
 | [docs/chat-session-storage.md](./docs/chat-session-storage.md) | 本地 Session 草稿（参考） |
 | [docs/app-release-china.md](./docs/app-release-china.md) | 国内上架（后期） |
