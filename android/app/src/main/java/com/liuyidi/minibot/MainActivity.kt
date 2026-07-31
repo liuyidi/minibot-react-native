@@ -1,4 +1,4 @@
-package com.liuyidi.deepseekchat
+package com.liuyidi.minibot
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

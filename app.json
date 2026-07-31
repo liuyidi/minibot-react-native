@@ -1,25 +1,26 @@
 {
   "expo": {
     "name": "Minibot",
-    "slug": "deepseek-chat",
-    "version": "1.0.2",
+    "slug": "minibot",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "deepseek-chat",
+    "scheme": "minibot",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.liuyidi.deepseekchat",
-      "buildNumber": "3",
+      "bundleIdentifier": "com.liuyidi.minibot",
+      "buildNumber": "5",
       "infoPlist": {
         "CFBundleDisplayName": "Minibot",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.liuyidi.deepseekchat",
-      "versionCode": 3,
+      "package": "com.liuyidi.minibot",
+      "versionCode": 5,
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

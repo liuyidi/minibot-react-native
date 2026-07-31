@@ -29,7 +29,7 @@
 | 本地存储 | DeepSeek API Key → SecureStore；minibot URL → AsyncStorage；离线会话草稿 → AsyncStorage |
 | 账号 | `deepseek-chat-api` 登录 + guest；与 minibot gateway auth 不同模型 |
 | 图标 | lucide-react-native（Phase 0 完成） |
-| 发布 | Expo SDK 54，`bundleIdentifier: com.liuyidi.deepseekchat`；已有 `eas.json` |
+| 发布 | Expo SDK 54，`bundleIdentifier: com.liuyidi.minibot`；已有 `eas.json` |
 
 ---
 

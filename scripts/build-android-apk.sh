@@ -83,7 +83,7 @@ cd "$ROOT_DIR/android"
 
 VERSION="$(node -p "require('../package.json').version")"
 APK_SRC="$ROOT_DIR/android/app/build/outputs/apk/release/app-release.apk"
-APK_DST="$ROOT_DIR/dist/deepseek-chat-${VERSION}-release.apk"
+APK_DST="$ROOT_DIR/dist/minibot-${VERSION}-release.apk"
 
 if [[ ! -f "$APK_SRC" ]]; then
   echo "APK not found: $APK_SRC" >&2

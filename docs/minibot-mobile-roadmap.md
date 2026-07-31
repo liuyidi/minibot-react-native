@@ -20,7 +20,7 @@
 | 设置 | 本地 API Key / model / thinking | overview、appearance、models/presets、runtime（对齐 webui `ui-entry.ts`） | 需改接 `/api/settings*` |
 | 鉴权 | email/password + guest | gateway bootstrap token（可选 secret） | 模型不同 |
 | 图标 | Ionicons + SF Symbols / `IconSymbol` | webui 已用 `lucide-react` | 可先统一 |
-| 品牌 | `deepseek-chat` / DeepSeek 文案 | Minibot | 重命名与文案 |
+| 品牌 | ~~`deepseek-chat` / DeepSeek 文案~~ | Minibot（包名 `com.liuyidi.minibot`） | 已完成工程/包名重命名；过渡 API 文案另批 |
 
 ```mermaid
 flowchart LR

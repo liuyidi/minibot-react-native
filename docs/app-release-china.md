@@ -10,7 +10,7 @@
 | 模块 | 当前状态 |
 |------|----------|
 | 技术栈 | Expo SDK 54，Managed Workflow |
-| 包名 | `com.liuyidi.deepseekchat`（iOS / Android） |
+| 包名 | `com.liuyidi.minibot`（iOS / Android） |
 | 构建 | 未配置 EAS |
 
 ---

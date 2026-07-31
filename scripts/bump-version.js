@@ -10,7 +10,7 @@ const ROOT_DIR = path.join(__dirname, "..");
 const PKG_PATH = path.join(ROOT_DIR, "package.json");
 const APP_JSON_PATH = path.join(ROOT_DIR, "app.json");
 const ANDROID_GRADLE_PATH = path.join(ROOT_DIR, "android/app/build.gradle");
-const IOS_PLIST_PATH = path.join(ROOT_DIR, "ios/DeepSeekChat/Info.plist");
+const IOS_PLIST_PATH = path.join(ROOT_DIR, "ios/Minibot/Info.plist");
 
 function bumpPatch(version) {
   const parts = version.split(".");
