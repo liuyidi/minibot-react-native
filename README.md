@@ -109,19 +109,28 @@ npm run web
 ## 项目结构
 
 ```
-app/
-├── _layout.tsx              # 根布局与 Providers
-├── (auth)/                  # 登录 / 注册
-└── (tabs)/
-    ├── index.tsx            # 首页
-    ├── explore.tsx          # Chat
-    └── settings/            # 嵌套设置栈
-components/                  # 聊天、设置、UI
-context/                     # Auth / Appearance / Language / ChatPreferences
-lib/                         # API、存储、主题相关
+index.tsx                    # 入口（gesture-handler + Expo Router → src/app）
+src/
+├── app/                     # Expo Router
+│   ├── _layout.tsx          # 根布局与 Providers
+│   ├── (auth)/              # 登录 / 注册
+│   ├── (tabs)/
+│   │   ├── index.tsx        # Chat
+│   │   ├── knowledge.tsx
+│   │   ├── discover.tsx
+│   │   └── me.tsx           # 我的（Tab 首页）
+│   └── settings/            # 二级设置页（根 Stack，无 Tab）
+├── components/              # 聊天、设置、UI、navigation
+├── context/                 # Auth / Appearance / Language / ChatPreferences / Minibot
+├── hooks/
+├── constants/
+├── types/
+└── lib/                     # 按域：minibot / deepseek / auth / chat / settings / i18n / theme
 docs/
-├── minibot-mobile-roadmap.md  # 主路线图
-└── TODO.md                    # 待办索引
+├── minibot-mobile-roadmap.md
+├── src-layout-plan.md       # 源码目录契约（已完成）
+└── TODO.md
+assets/                      # 图片 / 字体（留根目录）
 ```
 
 ## 文档
@@ -129,9 +138,9 @@ docs/
 | 文档 | 说明 |
 |------|------|
 | [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md) | 与 minibot / webui 的差距与分阶段计划 |
+| [docs/src-layout-plan.md](./docs/src-layout-plan.md) | 源码收拢到 `src/`（已完成） |
 | [docs/expo-go-ios-wss-debugging.md](./docs/expo-go-ios-wss-debugging.md) | Expo Go iOS WSS 失败排查（SocketRocket vs WebKit） |
 | [docs/TODO.md](./docs/TODO.md) | 待办总览 |
-| [docs/chat-session-storage.md](./docs/chat-session-storage.md) | 本地 Session 草稿（参考） |
 | [docs/app-release-china.md](./docs/app-release-china.md) | 国内上架（后期） |
 
 ## 常用脚本

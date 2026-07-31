@@ -49,6 +49,7 @@
     "extra": {
       "chatApiBaseUrl": "http://127.0.0.1:8000",
       "minibotBaseUrl": "https://bot.liuyidi.me",
+      "minibotBaseUrlAndroid": "http://116.62.35.76:8766",
       "minibotAuthSecret": ""
     }
   }

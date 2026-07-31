@@ -1,7 +1,7 @@
-# Plan: 源码收拢到 `src/`（待执行）
+# Plan: 源码收拢到 `src/`
 
-> 状态：**未执行** — 只作目录契约，晚点按此迁移。  
-> 约定时间：2026-07-30
+> 状态：**已完成**（2026-07-31）  
+> 约定时间：2026-07-30 · 执行：2026-07-31
 
 ## 目标
 
@@ -19,7 +19,7 @@ minibot-react-native/
 ├── tsconfig.json          # "@/*" → "./src/*"
 ├── metro.config.js
 ├── eas.json
-├── index.tsx              # 入口（gesture-handler + expo-router）；去掉与 app/ 撞名的 app.ts
+├── index.tsx              # 入口（gesture-handler + expo-router → src/app）
 ├── .npmrc
 ├── .env.example
 ├── .gitignore
@@ -37,21 +37,19 @@ minibot-react-native/
 ├── docs/                  # 文档（含本计划）
 │
 └── src/                   # ★ 全部应用源码
-    ├── app/               # Expo Router（现根目录 app/ 挪入）
+    ├── app/               # Expo Router
     │   ├── _layout.tsx
     │   ├── +not-found.tsx
     │   ├── (auth)/
-    │   └── (tabs)/
-    │       ├── index.tsx
-    │       ├── discover.tsx
-    │       ├── knowledge.tsx
-    │       └── settings/
+    │   ├── (tabs)/        # chat / knowledge / discover / me
+    │   └── settings/      # 二级设置（根 Stack，无 Tab）
     │
     ├── components/
     │   ├── ui/
     │   ├── auth/
     │   ├── chat/
-    │   └── settings/
+    │   ├── settings/
+    │   └── navigation/
     │
     ├── context/
     ├── hooks/
@@ -62,7 +60,7 @@ minibot-react-native/
         ├── minibot/
         ├── deepseek/      # 过渡期
         ├── auth/
-        ├── chat/
+        ├── chat/          # 含 session/
         ├── settings/
         ├── i18n/
         └── theme/
@@ -70,23 +68,23 @@ minibot-react-native/
 
 ## 映射（现状 → 目标）
 
-| 现在 | 最终 |
+| 现在（迁移前） | 最终 |
 |------|------|
 | `/app` | `/src/app` |
 | `/components`、`/context`、`/hooks`、`/constants`、`/types`、`/lib` | `/src/…` 同名 |
-| `/lib/*.ts` 平铺 | `/src/lib/{minibot,deepseek,auth,chat,settings,…}` |
+| `/lib/*.ts` 平铺 | `/src/lib/{minibot,deepseek,auth,chat,settings,i18n,theme}` |
 | `/assets`、`/docs`、`/scripts`、`android`、`ios` | 仍在根 |
-| `app.ts`（备用入口） | 删除或并入 `index.tsx` |
-| `screenshot/` | `docs/screenshots/` 或移出日常路径 |
-| 未用模板组件（如 `HelloWave`） | 删除 |
+| `app.ts`（备用入口） | 已删除，逻辑并入 `index.tsx` |
+| `screenshot/` | 仓库中不存在，跳过 |
+| 未用模板（`HelloWave`、`ParallaxScrollView`、`Collapsible`、`ChatMessageBox`、`ReplyMessageBar`） | 已删除 |
 
-## 落地步骤（执行时按序）
+## 落地步骤
 
-1. **整迁进 `src/`**：移动 `app` / `components` / `context` / `hooks` / `constants` / `types` / `lib`；改 `tsconfig` paths、`metro`（若需要）、入口对 `app` 的 context 路径。
-2. **冒烟**：`npx expo start`，登录 / 设置 / Minibot server 连接仍可用。
-3. **`lib/` 按域重命名**：调整 import；跑一遍 TypeScript / 关键路径。
-4. **清遗留**：删 `app.ts`、无用模板、整理 `screenshot`。
-5. **更新 README** 项目结构一节与本计划状态为「已完成」。
+1. ~~**整迁进 `src/`**~~：已移动；`tsconfig` paths → `./src/*`；`index.tsx` 的 `require.context("./src/app")`。
+2. ~~**冒烟**~~：请本地 `npx expo start` 验证登录 / 设置 / Minibot 连接（Metro 需重启以加载新目录）。
+3. ~~**`lib/` 按域重命名**~~：imports 已批量改为 `@/lib/{domain}/…`；`tsc --noEmit` 仅剩既有 `ExternalLink` typed-routes 告警。
+4. ~~**清遗留**~~：已删 `app.ts` 与未用模板。
+5. ~~**更新 README**~~：中英文「项目结构」已同步；本计划标为已完成。
 
 ## 刻意不做
 

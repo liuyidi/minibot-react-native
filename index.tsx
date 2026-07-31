@@ -5,15 +5,18 @@
 import "react-native-gesture-handler";
 
 import { registerRootComponent } from "expo";
+import { createElement } from "react";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ExpoRoot } from "expo-router";
 
-import App from "./app";
+// Metro context for Expo Router (app lives under src/app).
+const ctx = require.context("./src/app");
 
 function Root() {
   return (
     <GestureHandlerRootView style={styles.root}>
-      <App />
+      {createElement(ExpoRoot, { context: ctx })}
     </GestureHandlerRootView>
   );
 }

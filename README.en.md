@@ -110,19 +110,28 @@ Until chat streams over minibot WS (Phase 2), you can keep using DeepSeek:
 ## Layout
 
 ```
-app/
-├── _layout.tsx              # Root layout & providers
-├── (auth)/                  # Login / register
-└── (tabs)/
-    ├── index.tsx            # Home
-    ├── explore.tsx          # Chat
-    └── settings/            # Nested settings stack
-components/                  # Chat, settings, UI
-context/                     # Auth / Appearance / Language / ChatPreferences
-lib/                         # API, storage, theme helpers
+index.tsx                    # Entry (gesture-handler + Expo Router → src/app)
+src/
+├── app/                     # Expo Router
+│   ├── _layout.tsx          # Root layout & providers
+│   ├── (auth)/              # Login / register
+│   ├── (tabs)/
+│   │   ├── index.tsx        # Chat
+│   │   ├── knowledge.tsx
+│   │   ├── discover.tsx
+│   │   └── me.tsx           # Me tab home
+│   └── settings/            # Settings detail screens (root stack, no tab bar)
+├── components/              # Chat, settings, UI, navigation
+├── context/                 # Auth / Appearance / Language / ChatPreferences / Minibot
+├── hooks/
+├── constants/
+├── types/
+└── lib/                     # Domains: minibot / deepseek / auth / chat / settings / i18n / theme
 docs/
-├── minibot-mobile-roadmap.md  # Main roadmap
-└── TODO.md                    # TODO index
+├── minibot-mobile-roadmap.md
+├── src-layout-plan.md       # Source layout contract (done)
+└── TODO.md
+assets/                      # Images / fonts (stay at repo root)
 ```
 
 ## Docs
@@ -130,8 +139,8 @@ docs/
 | Doc | Purpose |
 |-----|---------|
 | [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md) | Gap analysis & phased plan vs minibot / webui |
+| [docs/src-layout-plan.md](./docs/src-layout-plan.md) | Source layout under `src/` (done) |
 | [docs/TODO.md](./docs/TODO.md) | TODO overview |
-| [docs/chat-session-storage.md](./docs/chat-session-storage.md) | Local session draft (reference) |
 | [docs/app-release-china.md](./docs/app-release-china.md) | China store release (later) |
 
 ## Scripts

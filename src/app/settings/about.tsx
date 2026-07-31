@@ -1,0 +1,92 @@
+import { CloudDownload, Info } from "lucide-react-native";
+import { router } from "expo-router";
+import { useRef } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { SettingsGroup } from "@/components/settings/SettingsGroup";
+import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
+import { ThemedText } from "@/components/ThemedText";
+import { useT } from "@/context/LanguageContext";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { getAppVersion } from "@/lib/settings/appVersion";
+
+const APP_VERSION = getAppVersion();
+const DOUBLE_TAP_MS = 350;
+
+export default function AboutSettingsScreen() {
+  const t = useT();
+  const insets = useSafeAreaInsets();
+  const theme = useAppTheme();
+  const lastFooterTapAt = useRef(0);
+
+  const handleCheckUpdate = () => {
+    Alert.alert(
+      t("about.upToDateTitle"),
+      t("about.upToDateBody", { version: APP_VERSION })
+    );
+  };
+
+  const handleFooterPress = () => {
+    const now = Date.now();
+    if (now - lastFooterTapAt.current < DOUBLE_TAP_MS) {
+      lastFooterTapAt.current = 0;
+      router.push("/settings/server");
+      return;
+    }
+    lastFooterTapAt.current = now;
+  };
+
+  return (
+    <ScrollView
+      style={[styles.screen, { backgroundColor: theme.background }]}
+      contentContainerStyle={[
+        styles.content,
+        { paddingBottom: insets.bottom + 24 },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
+      <SettingsGroup>
+        <SettingsNavRow
+          title={t("about.checkUpdate")}
+          value={`v${APP_VERSION}`}
+          icon={CloudDownload}
+          onPress={handleCheckUpdate}
+        />
+        <SettingsNavRow
+          title={t("about.aboutApp")}
+          icon={Info}
+          showDivider={false}
+          onPress={() => router.push("/settings/about-app")}
+        />
+      </SettingsGroup>
+
+      <Pressable
+        accessibilityRole="text"
+        onPress={handleFooterPress}
+        style={styles.footer}
+      >
+        <ThemedText type="secondary">Minibot</ThemedText>
+        <ThemedText type="secondary">
+          {t("common.version")} {APP_VERSION}
+        </ThemedText>
+      </Pressable>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  content: {
+    padding: 20,
+    gap: 16,
+  },
+  footer: {
+    alignItems: "center",
+    gap: 4,
+    marginTop: 8,
+    paddingVertical: 12,
+  },
+});
