@@ -1,10 +1,9 @@
 {
   "name": "minibot",
   "main": "./index.tsx",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -14,18 +13,19 @@
     "build:android:prebuild": "expo prebuild --platform android --no-install",
     "build:android:apk": "bash scripts/build-android-apk.sh",
     "install:deps": "bash scripts/npm-with-github-auth.sh install",
-    "setup:github-packages": "bash scripts/setup-github-packages.sh"
+    "setup:github-packages": "bash scripts/setup-github-packages.sh",
+    "sync:tokens": "node scripts/sync-design-tokens.mjs"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "@minibot/client": "npm:@liuyidi/minibot-client@0.1.0",
+    "@minibot/client": "file:../minibot/packages/minibot-client",
+    "@minibot/ui": "file:./packages/ui",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
-    "axios": "^1.7.9",
     "expo": "~54.0.35",
     "expo-blur": "~15.0.8",
     "expo-clipboard": "~8.0.8",
@@ -37,7 +37,6 @@
     "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
-    "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.11",
     "lucide-react-native": "^1.28.0",

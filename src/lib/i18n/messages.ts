@@ -39,6 +39,8 @@ export type MessageCatalog = {
     lightDesc: string;
     dark: string;
     darkDesc: string;
+    packBrand: string;
+    packBrandDesc: string;
     packCodex: string;
     packCodexDesc: string;
     packClaude: string;
@@ -56,11 +58,7 @@ export type MessageCatalog = {
     server: string;
     appearance: string;
     language: string;
-    model: string;
-    thinking: string;
     account: string;
-    apiKey: string;
-    usage: string;
     about: string;
     logout: string;
     logoutConfirmTitle: string;
@@ -75,18 +73,13 @@ export type MessageCatalog = {
     statusReconnecting: string;
     statusClosed: string;
     statusError: string;
-    connectedWithModel: string;
   };
   settingsTitles: {
     profile: string;
     appearance: string;
     language: string;
     account: string;
-    apiKey: string;
     server: string;
-    model: string;
-    thinking: string;
-    usage: string;
     about: string;
     aboutApp: string;
   };
@@ -95,13 +88,6 @@ export type MessageCatalog = {
     newChat: string;
     placeholder: string;
     streamingPlaceholder: string;
-    noApiTitle: string;
-    noApiBody: string;
-    configureKey: string;
-    noServerTitle: string;
-    noServerBody: string;
-    connectServer: string;
-    configureApiKey: string;
     thinkingProcess: string;
     expand: string;
     collapse: string;
@@ -113,7 +99,6 @@ export type MessageCatalog = {
     minibotReconnecting: string;
     minibotFailed: string;
     minibotOffline: string;
-    deepseekDirect: string;
     loadSessionFailed: string;
     createSessionFailed: string;
     stopGeneration: string;
@@ -136,7 +121,6 @@ export type MessageCatalog = {
     saveReconnect: string;
     probeSessions: string;
     hint: string;
-    modelLabel: string;
     remoteSessions: string;
   };
   discover: {
@@ -213,44 +197,6 @@ export type MessageCatalog = {
     edgeOpen: string;
     serverStatus: string;
   };
-  prefs: {
-    thinkingLabel: string;
-    onShort: string;
-    offShort: string;
-  };
-  apiKey: {
-    emptyTitle: string;
-    emptyBody: string;
-    configured: string;
-    placeholderUpdate: string;
-    save: string;
-    clear: string;
-    clearConfirmTitle: string;
-    clearConfirmBody: string;
-    clearAction: string;
-    saveSuccessTitle: string;
-    saveSuccessBody: string;
-    saveFailTitle: string;
-    saveFailBody: string;
-    emptyAlertTitle: string;
-    emptyAlertBody: string;
-    formatWarnTitle: string;
-    formatWarnBody: string;
-    copiedTitle: string;
-    copiedBody: string;
-    howToTitle: string;
-    howToBody: string;
-    getKeyLink: string;
-    show: string;
-    hide: string;
-    showA11y: string;
-    hideA11y: string;
-    copyA11y: string;
-  };
-  thinking: {
-    hint: string;
-    reasonerLocked: string;
-  };
   about: {
     checkUpdate: string;
     upToDateTitle: string;
@@ -263,9 +209,6 @@ export type MessageCatalog = {
     repoLink: string;
     githubLink: string;
     versionLabel: string;
-  };
-  model: {
-    hint: string;
   };
   profile: {
     avatarColor: string;
@@ -305,30 +248,6 @@ export type MessageCatalog = {
     deleteAccountTitle: string;
     deleteAccountBody: string;
     deleteConfirm: string;
-  };
-  usage: {
-    noRecords: string;
-    needApiKey: string;
-    loadFailed: string;
-    resetTitle: string;
-    resetBody: string;
-    resetAction: string;
-    noApiTitle: string;
-    noApiBody: string;
-    goConfigure: string;
-    balanceTitle: string;
-    availableBalance: string;
-    balanceOk: string;
-    balanceLow: string;
-    topupBalance: string;
-    grantBalance: string;
-    localUsage: string;
-    totalTokens: string;
-    inputTokens: string;
-    outputTokens: string;
-    requestCount: string;
-    lastUpdated: string;
-    resetLocal: string;
   };
 };
 
@@ -371,6 +290,8 @@ export const zh: MessageCatalog = {
     lightDesc: "始终使用浅色界面",
     dark: "深色",
     darkDesc: "始终使用深色界面",
+    packBrand: "Mini",
+    packBrandDesc: "Mini Direction 02：白底 / 近黑字，黑主按钮",
     packCodex: "Codex",
     packCodexDesc: "OpenAI Codex：冷白 / 石墨，墨色强调",
     packClaude: "Claude",
@@ -388,11 +309,7 @@ export const zh: MessageCatalog = {
     server: "Minibot 服务器",
     appearance: "外观",
     language: "语言",
-    model: "模型",
-    thinking: "思考模式",
     account: "账号",
-    apiKey: "API Key",
-    usage: "用量",
     about: "关于 Minibot",
     logout: "退出登录",
     logoutConfirmTitle: "退出登录",
@@ -407,18 +324,13 @@ export const zh: MessageCatalog = {
     statusReconnecting: "重连中",
     statusClosed: "已断开",
     statusError: "错误",
-    connectedWithModel: "已连接 · {model}",
   },
   settingsTitles: {
     profile: "个人信息",
     appearance: "外观",
     language: "语言",
     account: "账号管理",
-    apiKey: "API Key",
     server: "Minibot 服务器",
-    model: "模型",
-    thinking: "思考模式",
-    usage: "Token 用量",
     about: "关于",
     aboutApp: "关于 Minibot",
   },
@@ -427,14 +339,6 @@ export const zh: MessageCatalog = {
     newChat: "新对话",
     placeholder: "给 Minibot 发送消息",
     streamingPlaceholder: "Minibot 正在回复…",
-    noApiTitle: "尚未配置 API Key",
-    noApiBody: "请先在「我的」页面配置 API Key，再开始聊天。",
-    configureKey: "配置 API Key",
-    noServerTitle: "尚未连接 Minibot",
-    noServerBody:
-      "正在连接 gateway。若长时间失败，可配置 DeepSeek API Key 作为离线过渡。",
-    connectServer: "重新连接",
-    configureApiKey: "配置 API Key",
     thinkingProcess: "思考过程",
     expand: "展开",
     collapse: "收起",
@@ -446,7 +350,6 @@ export const zh: MessageCatalog = {
     minibotReconnecting: "minibot 重连中",
     minibotFailed: "minibot 连接失败",
     minibotOffline: "minibot 未连接",
-    deepseekDirect: "DeepSeek 直连",
     loadSessionFailed: "加载会话失败",
     createSessionFailed: "创建会话失败",
     stopGeneration: "停止生成",
@@ -469,7 +372,6 @@ export const zh: MessageCatalog = {
     saveReconnect: "保存并重连",
     probeSessions: "测 sessions",
     hint: "使用 @minibot/client：bootstrap → REST sessions → WS multiplex。iOS 模拟器可用 127.0.0.1；Android 模拟器用 10.0.2.2；真机请填电脑局域网 IP，且 minibot 需监听 0.0.0.0:8766。",
-    modelLabel: "模型：{model}",
     remoteSessions: "远端会话：{count}",
   },
   discover: {
@@ -546,45 +448,6 @@ export const zh: MessageCatalog = {
     edgeOpen: "从左边缘滑动打开会话列表",
     serverStatus: "服务器状态：{label}",
   },
-  prefs: {
-    thinkingLabel: "思考 {state}",
-    onShort: "开",
-    offShort: "关",
-  },
-  apiKey: {
-    emptyTitle: "尚未配置",
-    emptyBody: "尚未配置，聊天功能需要先设置 API Key",
-    configured: "已配置 {key}",
-    placeholderUpdate: "输入新密钥以更新",
-    save: "保存密钥",
-    clear: "清除密钥",
-    clearConfirmTitle: "清除 API Key",
-    clearConfirmBody: "清除后需要重新配置才能聊天。",
-    clearAction: "清除",
-    saveSuccessTitle: "保存成功",
-    saveSuccessBody: "API Key 已保存。",
-    saveFailTitle: "保存失败",
-    saveFailBody: "请稍后重试。",
-    emptyAlertTitle: "请输入 API Key",
-    emptyAlertBody: "密钥不能为空。",
-    formatWarnTitle: "格式可能有误",
-    formatWarnBody: "API Key 通常以 sk- 开头。",
-    copiedTitle: "已复制",
-    copiedBody: "API Key 已复制到剪贴板。",
-    howToTitle: "如何获取 API Key",
-    howToBody:
-      "1. 登录 API 开放平台\n2. 进入 API Keys 页面\n3. 点击 Create API Key 并复制密钥",
-    getKeyLink: "前往密钥平台获取 →",
-    show: "显示",
-    hide: "隐藏",
-    showA11y: "显示 API Key",
-    hideA11y: "隐藏 API Key",
-    copyA11y: "复制 API Key",
-  },
-  thinking: {
-    hint: "开启后，模型会先输出思考过程，再给出最终回答。V4 模型默认开启思考，此处关闭后将不再展示思考过程。Reasoner 模型始终开启思考模式。",
-    reasonerLocked: "当前模型为 Reasoner，思考模式始终开启。",
-  },
   about: {
     checkUpdate: "版本更新",
     upToDateTitle: "版本更新",
@@ -598,9 +461,6 @@ export const zh: MessageCatalog = {
     repoLink: "Minibot 仓库 →",
     githubLink: "GitHub 开源仓库 →",
     versionLabel: "版本 {version}",
-  },
-  model: {
-    hint: "选择聊天使用的模型。V4 系列为当前推荐模型。",
   },
   profile: {
     avatarColor: "选择头像颜色",
@@ -640,30 +500,6 @@ export const zh: MessageCatalog = {
     deleteAccountTitle: "注销账号",
     deleteAccountBody: "注销后将清除本机全部账号与聊天配置数据，此操作不可恢复。",
     deleteConfirm: "确认注销",
-  },
-  usage: {
-    noRecords: "暂无记录",
-    needApiKey: "请先配置 API Key 后查看账户余额。",
-    loadFailed: "加载失败，请检查网络或 API Key 是否有效。",
-    resetTitle: "重置统计",
-    resetBody: "将清除本机累计的 Token 用量记录，不影响账户余额。",
-    resetAction: "重置",
-    noApiTitle: "尚未配置 API Key",
-    noApiBody: "配置后可查询账户余额，聊天时会自动累计本机 Token 用量。",
-    goConfigure: "去配置",
-    balanceTitle: "账户余额",
-    availableBalance: "可用余额",
-    balanceOk: "余额充足，可正常调用 API",
-    balanceLow: "余额不足，请及时充值",
-    topupBalance: "充值余额",
-    grantBalance: "赠送余额",
-    localUsage: "本机 Token 用量",
-    totalTokens: "累计 Token",
-    inputTokens: "输入 Token",
-    outputTokens: "输出 Token",
-    requestCount: "请求次数",
-    lastUpdated: "统计本 App 内聊天产生的 Token，最后更新：{time}",
-    resetLocal: "重置本机统计",
   },
 };
 
@@ -707,6 +543,8 @@ export const en: MessageCatalog = {
     lightDesc: "Always use light appearance",
     dark: "Dark",
     darkDesc: "Always use dark appearance",
+    packBrand: "Mini",
+    packBrandDesc: "Mini Direction 02: white canvas / near-black ink, black primary",
     packCodex: "Codex",
     packCodexDesc: "OpenAI Codex: cool white / graphite, ink accent",
     packClaude: "Claude",
@@ -724,11 +562,7 @@ export const en: MessageCatalog = {
     server: "Minibot server",
     appearance: "Appearance",
     language: "Language",
-    model: "Model",
-    thinking: "Thinking",
     account: "Account",
-    apiKey: "API Key",
-    usage: "Usage",
     about: "About Minibot",
     logout: "Sign out",
     logoutConfirmTitle: "Sign out",
@@ -743,18 +577,13 @@ export const en: MessageCatalog = {
     statusReconnecting: "Reconnecting",
     statusClosed: "Disconnected",
     statusError: "Error",
-    connectedWithModel: "Connected · {model}",
   },
   settingsTitles: {
     profile: "Profile",
     appearance: "Appearance",
     language: "Language",
     account: "Account",
-    apiKey: "API Key",
     server: "Minibot server",
-    model: "Model",
-    thinking: "Thinking",
-    usage: "Token usage",
     about: "About",
     aboutApp: "About Minibot",
   },
@@ -763,14 +592,6 @@ export const en: MessageCatalog = {
     newChat: "New chat",
     placeholder: "Message Minibot",
     streamingPlaceholder: "Minibot is replying…",
-    noApiTitle: "API Key required",
-    noApiBody: "Add an API Key in Me before chatting.",
-    configureKey: "Configure API Key",
-    noServerTitle: "Minibot not connected",
-    noServerBody:
-      "Connecting to the gateway. If it keeps failing, configure a DeepSeek API Key as a fallback.",
-    connectServer: "Reconnect",
-    configureApiKey: "Configure API Key",
     thinkingProcess: "Thinking",
     expand: "Expand",
     collapse: "Collapse",
@@ -782,7 +603,6 @@ export const en: MessageCatalog = {
     minibotReconnecting: "minibot reconnecting",
     minibotFailed: "minibot failed",
     minibotOffline: "minibot offline",
-    deepseekDirect: "DeepSeek direct",
     loadSessionFailed: "Failed to load session",
     createSessionFailed: "Failed to create session",
     stopGeneration: "Stop generating",
@@ -805,7 +625,6 @@ export const en: MessageCatalog = {
     saveReconnect: "Save & reconnect",
     probeSessions: "Probe sessions",
     hint: "Uses @minibot/client: bootstrap → REST sessions → WS multiplex. iOS Simulator: 127.0.0.1; Android emulator: 10.0.2.2; physical devices need your LAN IP with minibot on 0.0.0.0:8766.",
-    modelLabel: "Model: {model}",
     remoteSessions: "Remote sessions: {count}",
   },
   discover: {
@@ -883,45 +702,6 @@ export const en: MessageCatalog = {
     edgeOpen: "Swipe from the left edge to open sessions",
     serverStatus: "Server status: {label}",
   },
-  prefs: {
-    thinkingLabel: "Thinking {state}",
-    onShort: "On",
-    offShort: "Off",
-  },
-  apiKey: {
-    emptyTitle: "Not configured",
-    emptyBody: "Not configured yet. Chat requires an API Key.",
-    configured: "Configured {key}",
-    placeholderUpdate: "Enter a new key to update",
-    save: "Save key",
-    clear: "Clear key",
-    clearConfirmTitle: "Clear API Key",
-    clearConfirmBody: "You will need to configure it again before chatting.",
-    clearAction: "Clear",
-    saveSuccessTitle: "Saved",
-    saveSuccessBody: "API Key saved.",
-    saveFailTitle: "Save failed",
-    saveFailBody: "Please try again later.",
-    emptyAlertTitle: "API Key required",
-    emptyAlertBody: "Key cannot be empty.",
-    formatWarnTitle: "Format warning",
-    formatWarnBody: "API Keys usually start with sk-.",
-    copiedTitle: "Copied",
-    copiedBody: "API Key copied to clipboard.",
-    howToTitle: "How to get an API Key",
-    howToBody:
-      "1. Sign in to the API platform\n2. Open the API Keys page\n3. Click Create API Key and copy the key",
-    getKeyLink: "Get a key from the platform →",
-    show: "Show",
-    hide: "Hide",
-    showA11y: "Show API Key",
-    hideA11y: "Hide API Key",
-    copyA11y: "Copy API Key",
-  },
-  thinking: {
-    hint: "When enabled, the model shows its reasoning before the final answer. V4 models think by default; turning this off hides the reasoning. Reasoner models always think.",
-    reasonerLocked: "Reasoner is selected; thinking mode is always on.",
-  },
   about: {
     checkUpdate: "Check for updates",
     upToDateTitle: "Up to date",
@@ -936,9 +716,6 @@ export const en: MessageCatalog = {
     repoLink: "Minibot repo →",
     githubLink: "GitHub open-source repo →",
     versionLabel: "Version {version}",
-  },
-  model: {
-    hint: "Choose the model for chat. V4 is currently recommended.",
   },
   profile: {
     avatarColor: "Avatar color",
@@ -979,30 +756,6 @@ export const en: MessageCatalog = {
     deleteAccountBody:
       "This clears all local account and chat data on this device. This cannot be undone.",
     deleteConfirm: "Delete account",
-  },
-  usage: {
-    noRecords: "No records",
-    needApiKey: "Configure an API Key to view account balance.",
-    loadFailed: "Load failed. Check your network or API Key.",
-    resetTitle: "Reset stats",
-    resetBody: "Clears local token usage totals. Does not affect account balance.",
-    resetAction: "Reset",
-    noApiTitle: "API Key required",
-    noApiBody: "Configure an API Key to view balance; in-app chat tracks local token usage.",
-    goConfigure: "Configure",
-    balanceTitle: "Account balance",
-    availableBalance: "Available balance",
-    balanceOk: "Balance is sufficient for API calls",
-    balanceLow: "Balance is low; please top up",
-    topupBalance: "Top-up balance",
-    grantBalance: "Granted balance",
-    localUsage: "Local token usage",
-    totalTokens: "Total tokens",
-    inputTokens: "Input tokens",
-    outputTokens: "Output tokens",
-    requestCount: "Requests",
-    lastUpdated: "Tokens from in-app chat. Last updated: {time}",
-    resetLocal: "Reset local stats",
   },
 };
 

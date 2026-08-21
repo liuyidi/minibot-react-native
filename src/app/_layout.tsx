@@ -11,7 +11,6 @@ import 'react-native-reanimated';
 
 import { AppearanceProvider, useAppearance } from '@/context/AppearanceContext';
 import { AuthProvider } from '@/context/AuthContext';
-import { ChatPreferencesProvider } from '@/context/ChatPreferencesContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { MinibotProvider } from '@/context/MinibotClientContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -72,9 +71,7 @@ export default function RootLayout() {
         <LanguageProvider>
           <AuthProvider>
             <MinibotProvider>
-              <ChatPreferencesProvider>
-                {loaded ? <RootLayoutNav /> : null}
-              </ChatPreferencesProvider>
+              {loaded ? <RootLayoutNav /> : null}
             </MinibotProvider>
           </AuthProvider>
         </LanguageProvider>

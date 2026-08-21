@@ -10,7 +10,6 @@ import {
 } from "@/lib/chat/session/storage";
 import type { ChatSession } from "@/lib/chat/session/types";
 import { defaultChatTitle } from "@/lib/chat/session/types";
-import type { DeepSeekModelId } from "@/lib/chat/preferencesConfig";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function useChatSessions() {
@@ -41,18 +40,14 @@ export function useChatSessions() {
     setSessions(await listChatSessions());
   }, []);
 
-  const createSession = useCallback(
-    async (model?: DeepSeekModelId) => {
-      const session = await createChatSession({
-        model,
-        title: defaultChatTitle(language),
-      });
-      setSessions(await listChatSessions());
-      setActiveSessionIdState(session.id);
-      return session;
-    },
-    [language]
-  );
+  const createSession = useCallback(async () => {
+    const session = await createChatSession({
+      title: defaultChatTitle(language),
+    });
+    setSessions(await listChatSessions());
+    setActiveSessionIdState(session.id);
+    return session;
+  }, [language]);
 
   const renameSession = useCallback(
     async (sessionId: string, title: string) => {
@@ -71,10 +66,7 @@ export function useChatSessions() {
   }, []);
 
   const touchSession = useCallback(
-    async (
-      sessionId: string,
-      patch?: Partial<Pick<ChatSession, "title" | "model">>
-    ) => {
+    async (sessionId: string, patch?: Partial<Pick<ChatSession, "title">>) => {
       await updateChatSession(sessionId, {
         ...patch,
         updatedAt: Date.now(),

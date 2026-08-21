@@ -4,7 +4,7 @@
 
 基于 **Expo + React Native** 的 **Minibot 移动端客户端**。目标是对接 [minibot](https://github.com/liuyidi/minibot) 的 FastAPI server 层（默认 `:8766`），把桌面端 [webui](https://github.com/liuyidi/minibot/tree/main/webui) 的能力带到 iOS / Android / Web。
 
-> **现状说明**：应用壳（导航、聊天 UI、设置栈、主题）已可用；**Phase 1 连接层已接入** `@minibot/client`（bootstrap + WS + sessions 探测）。聊天主路径仍可走 DeepSeek 直连作为过渡；长期路径是 minibot WS 流式，详见 [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md)。
+> **现状说明**：应用壳（导航、聊天 UI、设置栈、主题）已可用；**Phase 1 连接层已接入** `@minibot/client`（bootstrap + REST + WS）。聊天仅走 minibot WS 流式（已移除 DeepSeek 直连），详见 [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md)。
 
 ## 产品定位
 
@@ -32,9 +32,9 @@
 - **跨平台**：iOS / Android / Web（Expo Go 或开发构建）
 - **三栏导航**：首页引导、Chat、设置（嵌套 Settings stack）
 - **聊天 UI**：`react-native-gifted-chat`，流式回复、reasoning 气泡、Markdown
-- **主题与偏好**：明暗模式、语言、模型 / thinking 等本地偏好
-- **账号（过渡）**：可选登录 / 访客；DeepSeek API Key 存于 Secure Store
-- **路线图**：对接 minibot 会话、WS 流式与设置面 —— 见 [docs/TODO.md](./docs/TODO.md)
+- **主题与偏好**：外观主题包、明暗模式、语言
+- **账号**：mini-auth 邮箱验证码 / Demo / OAuth；Gateway Bearer
+- **路线图**：会话体验与设置面对齐 webui —— 见 [docs/TODO.md](./docs/TODO.md)
 
 ## 技术栈
 
@@ -43,8 +43,8 @@
 | 框架 | Expo SDK 54、React Native 0.81 |
 | 路由 | Expo Router 6 |
 | 聊天 UI | react-native-gifted-chat |
-| 网络 | `@minibot/client`（bootstrap / REST / WS）+ axios（过渡期 DeepSeek） |
-| 密钥存储 | expo-secure-store |
+| 网络 | `@minibot/client`（bootstrap / REST / WS） |
+| 安全存储 | expo-secure-store（auth token） |
 | 语言 | TypeScript |
 
 目标协议（实施中）：minibot `GET /webui/bootstrap`、Bearer REST、`/ws?token=`。
@@ -92,19 +92,11 @@ npm run android
 npm run web
 ```
 
-### 3. 过渡期：配置 DeepSeek（当前聊天主路径）
+### 3. 连接 minibot 并聊天
 
-在 minibot 连接层完成前，可继续用 DeepSeek：
-
-1. 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建 API Key  
-2. App 内 **设置 → API Key** 保存（仅本机 Secure Store）  
-3. 打开 **Chat** 开始对话  
-
-### 4. 连接 minibot
-
-1. 默认连生产：`https://bot.liuyidi.me`  
-2. 本地调试：本机起 minibot，在设置里改 Base URL（模拟器 `127.0.0.1` / Android `10.0.2.2`）  
-3. 客户端经 `@minibot/client`：bootstrap + REST + WebSocket  
+1. 登录（邮箱验证码 / Demo / OAuth）后默认连生产 Gateway：`https://bot.liuyidi.me`  
+2. 本地调试：本机起 minibot，在「关于」双击底部版本号进入服务器设置，改 Base URL（模拟器 `127.0.0.1` / Android `10.0.2.2`）  
+3. Chat Tab 仅在 gateway 已连接时可发消息（WS `attach` / delta / abort）  
 
 ## 项目结构
 
@@ -121,11 +113,11 @@ src/
 │   │   └── me.tsx           # 我的（Tab 首页）
 │   └── settings/            # 二级设置页（根 Stack，无 Tab）
 ├── components/              # 聊天、设置、UI、navigation
-├── context/                 # Auth / Appearance / Language / ChatPreferences / Minibot
+├── context/                 # Auth / Appearance / Language / Minibot
 ├── hooks/
 ├── constants/
 ├── types/
-└── lib/                     # 按域：minibot / deepseek / auth / chat / settings / i18n / theme
+└── lib/                     # 按域：minibot / auth / chat / settings / i18n / theme
 docs/
 ├── minibot-mobile-roadmap.md
 ├── src-layout-plan.md       # 源码目录契约（已完成）
@@ -157,8 +149,7 @@ assets/                      # 图片 / 字体（留根目录）
 
 - **Expo Go**：须为 SDK 54。  
 - **iOS 输入**：GiftedChat 需 `maxInputLength`，项目内已处理。  
-- **DeepSeek 402**：多为 Key 无效或余额不足。  
-- **minibot 联调**：优先看路线图 Phase 1；勿与 DeepSeek 直连 Key 两套策略长期并存。
+- **minibot 联调**：优先看路线图 Phase 1；聊天依赖 gateway 连接（无本地直连模型 fallback）。
 
 ## 相关链接
 
@@ -168,7 +159,7 @@ assets/                      # 图片 / 字体（留根目录）
 
 ## 致谢
 
-早期壳基于 [hellochirag/deepseek-react-native](https://github.com/hellochirag/deepseek-react-native) 二次开发；产品方向已转向 Minibot 移动端。
+早期工程壳曾 fork 自开源聊天 demo；当前产品为 Minibot 移动端客户端。
 
 ## License
 

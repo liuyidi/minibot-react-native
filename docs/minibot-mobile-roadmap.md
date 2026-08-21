@@ -9,7 +9,7 @@
 
 ## 差距总览
 
-当前 RN 应用仍是 **DeepSeek 直连聊天壳**；目标是 **minibot 的移动端 WebUI**。
+当前 RN 应用已**移除 DeepSeek 直连**，聊天仅走 minibot Gateway；目标是 **minibot 的移动端 WebUI**。
 
 | 维度 | RN 现状 | minibot + webui 目标 | 差距 |
 |------|---------|----------------------|------|

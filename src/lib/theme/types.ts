@@ -31,7 +31,7 @@ export type ThemePalette = {
   yellow: string;
 };
 
-export type ThemeId = "codex" | "claude";
+export type ThemeId = "brand" | "codex" | "claude";
 
 export type ThemeDefinition = {
   id: ThemeId;

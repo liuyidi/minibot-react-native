@@ -43,10 +43,16 @@ export default function AppearanceSettingsScreen() {
     },
   ];
 
-  const packDesc = (id: ThemeId) =>
-    id === "claude" ? t("appearance.packClaudeDesc") : t("appearance.packCodexDesc");
-  const packName = (id: ThemeId) =>
-    id === "claude" ? t("appearance.packClaude") : t("appearance.packCodex");
+  const packDesc = (id: ThemeId) => {
+    if (id === "brand") return t("appearance.packBrandDesc");
+    if (id === "claude") return t("appearance.packClaudeDesc");
+    return t("appearance.packCodexDesc");
+  };
+  const packName = (id: ThemeId) => {
+    if (id === "brand") return t("appearance.packBrand");
+    if (id === "claude") return t("appearance.packClaude");
+    return t("appearance.packCodex");
+  };
 
   return (
     <ScrollView

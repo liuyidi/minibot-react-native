@@ -34,7 +34,6 @@ export default function MinibotServerSettingsScreen() {
   const {
     client,
     status,
-    modelName,
     runtimeSurface,
     lastError,
     isConnected,
@@ -158,11 +157,6 @@ export default function MinibotServerSettingsScreen() {
           <ThemedText type="secondary" numberOfLines={2}>
             {liveBaseUrl || baseUrl || "—"}
           </ThemedText>
-          {modelName ? (
-            <ThemedText type="secondary">
-              {t("server.modelLabel", { model: modelName })}
-            </ThemedText>
-          ) : null}
           {runtimeSurface ? (
             <ThemedText type="secondary">runtime：{runtimeSurface}</ThemedText>
           ) : null}
@@ -185,7 +179,7 @@ export default function MinibotServerSettingsScreen() {
         onChangeText={setBaseUrlDraft}
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder="https://bot.liuyidi.me / http://116.62.35.76:8766"
+        placeholder="https://bot.liuyidi.me"
         placeholderTextColor={theme.textSecondary}
         style={[
           styles.input,

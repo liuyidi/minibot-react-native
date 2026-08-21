@@ -60,9 +60,11 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* Hidden for now — keep route files for a later hub; see mobile rebuild spec. */}
       <Tabs.Screen
         name="knowledge"
         options={{
+          href: null,
           title: t('tabs.knowledge'),
           tabBarIcon: ({ color }) => (
             <AppIcon icon={BookOpen} size={26} color={color} />
@@ -72,6 +74,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="discover"
         options={{
+          href: null,
           title: t('tabs.discover'),
           tabBarIcon: ({ color }) => (
             <AppIcon icon={Compass} size={26} color={color} />

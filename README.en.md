@@ -4,7 +4,7 @@
 
 **Expo + React Native** mobile client for **Minibot**. The goal is to talk to the [minibot](https://github.com/liuyidi/minibot) FastAPI server (default `:8766`) and bring the desktop [webui](https://github.com/liuyidi/minibot/tree/main/webui) experience to iOS, Android, and Web.
 
-> **Status**: App shell is usable. **Phase 1 connection layer** is wired via `@minibot/client` (bootstrap + WS + sessions probe). Chat can still use DeepSeek as a bridge; long-term path is minibot WS streaming — see [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md).
+> **Status**: App shell is usable. **Phase 1 connection layer** is wired via `@minibot/client` (bootstrap + REST + WS). Chat is minibot WS only (DeepSeek direct path removed) — see [docs/minibot-mobile-roadmap.md](./docs/minibot-mobile-roadmap.md).
 
 ## Positioning
 
@@ -32,9 +32,9 @@
 - **Cross-platform**: iOS / Android / Web (Expo Go or dev builds)
 - **Three-tab nav**: Home, Chat, Settings (nested settings stack)
 - **Chat UI**: `react-native-gifted-chat` with streaming, reasoning bubbles, Markdown
-- **Theme & prefs**: light/dark, language, model / thinking stored locally
-- **Auth (transitional)**: optional login / guest; DeepSeek API key in Secure Store
-- **Roadmap**: minibot sessions, WS streaming, settings parity — [docs/TODO.md](./docs/TODO.md)
+- **Theme & prefs**: appearance packs, light/dark, language
+- **Auth**: mini-auth email OTP / Demo / OAuth; Gateway Bearer
+- **Roadmap**: session UX and settings parity — [docs/TODO.md](./docs/TODO.md)
 
 ## Stack
 
@@ -43,8 +43,8 @@
 | Framework | Expo SDK 54, React Native 0.81 |
 | Routing | Expo Router 6 |
 | Chat UI | react-native-gifted-chat |
-| Networking | `@minibot/client` (bootstrap / REST / WS) + axios (transitional DeepSeek) |
-| Secrets | expo-secure-store |
+| Networking | `@minibot/client` (bootstrap / REST / WS) |
+| Secure storage | expo-secure-store (auth token) |
 | Language | TypeScript |
 
 Target protocol (in progress): minibot `GET /webui/bootstrap`, Bearer REST, `/ws?token=`.
@@ -92,20 +92,11 @@ npm run android
 npm run web
 ```
 
-### 3. Bridge path: DeepSeek (current chat)
+### 3. Connect minibot and chat
 
-Until chat streams over minibot WS (Phase 2), you can keep using DeepSeek:
-
-1. Create a key on the [DeepSeek platform](https://platform.deepseek.com/)  
-2. In the app: **Me → API Key** (Secure Store only)  
-3. Open **Chat**  
-
-### 4. Minibot connection (Phase 1 done)
-
-1. Default gateway is `https://bot.liuyidi.me`  
-2. **Me → Minibot server** — override Base URL for local debug, connect / probe sessions  
-3. Chat header shows connection status (tap → server settings)  
-4. Next: replace DeepSeek SSE with `client.ws` streaming
+1. After login (email OTP / Demo / OAuth), the default gateway is `https://bot.liuyidi.me`  
+2. Local debug: run minibot locally; double-tap the version footer under About to open server settings and override Base URL  
+3. Chat Tab only sends when the gateway is connected (WS `attach` / delta / abort)  
 
 ## Layout
 
@@ -122,11 +113,11 @@ src/
 │   │   └── me.tsx           # Me tab home
 │   └── settings/            # Settings detail screens (root stack, no tab bar)
 ├── components/              # Chat, settings, UI, navigation
-├── context/                 # Auth / Appearance / Language / ChatPreferences / Minibot
+├── context/                 # Auth / Appearance / Language / Minibot
 ├── hooks/
 ├── constants/
 ├── types/
-└── lib/                     # Domains: minibot / deepseek / auth / chat / settings / i18n / theme
+└── lib/                     # Domains: minibot / auth / chat / settings / i18n / theme
 docs/
 ├── minibot-mobile-roadmap.md
 ├── src-layout-plan.md       # Source layout contract (done)
@@ -157,8 +148,7 @@ assets/                      # Images / fonts (stay at repo root)
 
 - **Expo Go** must be SDK 54.  
 - **iOS input**: GiftedChat needs `maxInputLength` (already set).  
-- **DeepSeek 402**: usually bad key or insufficient balance.  
-- **minibot wiring**: follow roadmap Phase 1; avoid long-term dual DeepSeek + provider key confusion.
+- **minibot wiring**: follow roadmap Phase 1; chat requires a connected gateway (no local model fallback).
 
 ## Links
 
@@ -168,7 +158,7 @@ assets/                      # Images / fonts (stay at repo root)
 
 ## Acknowledgments
 
-The early shell was based on [hellochirag/deepseek-react-native](https://github.com/hellochirag/deepseek-react-native). Product direction is now the Minibot mobile client.
+Early shell forked from an open-source chat demo; the product is now the Minibot mobile client.
 
 ## License
 

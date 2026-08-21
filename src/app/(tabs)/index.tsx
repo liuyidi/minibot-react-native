@@ -1,12 +1,5 @@
-import { useDeepSeekApiKey } from "@/hooks/useDeepSeekApiKey";
 import { useChatSessions } from "@/hooks/useChatSessions";
 import { useMinibotSessions } from "@/hooks/useMinibotSessions";
-import { addTokenUsage } from "@/lib/settings/tokenUsageConfig";
-import {
-  buildChatApiMessages,
-  formatChatErrorMessage,
-  streamDeepSeekChat,
-} from "@/lib/deepseek/chat";
 import {
   loadSessionMessages,
   saveSessionMessages,
@@ -20,13 +13,11 @@ import {
 } from "@/lib/chat/session/types";
 import { BOT_USER } from "@/lib/minibot/threadMessages";
 import { startWsTurn } from "@/lib/minibot/wsTurn";
-import { ChevronDown, Key, Server } from "lucide-react-native";
-import { router } from "expo-router";
+import { ChevronDown } from "lucide-react-native";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   Platform,
-  Pressable,
   StyleSheet,
   View,
 } from "react-native";
@@ -40,7 +31,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 import { AppIcon } from "@/components/ui/AppIcon";
 import { ChatBubble } from "@/components/chat/ChatBubble";
-import { ChatPreferencesBar } from "@/components/chat/ChatPreferencesBar";
 import {
   ChatHeader,
   ChatSessionDrawer,
@@ -49,8 +39,6 @@ import {
   FloatingChatComposer,
   useChatComposerLayout,
 } from "@/components/chat/FloatingChatComposer";
-import { ThemedText } from "@/components/ThemedText";
-import { useChatPreferences } from "@/context/ChatPreferencesContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useMinibot } from "@/context/MinibotClientContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -100,18 +88,13 @@ export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const colorScheme = useColorScheme() ?? "light";
-  const { apiKey, hasApiKey, isLoading } = useDeepSeekApiKey();
-  const { model, thinkingEnabled } = useChatPreferences();
   const {
     client,
     status: minibotStatus,
     isConnected,
-    modelName,
-    connect,
-    refreshConfigAndReconnect,
   } = useMinibot();
   const useMinibotPath = isConnected && Boolean(client);
-  const canChat = useMinibotPath || hasApiKey;
+  const canChat = useMinibotPath;
   const tabBarHeight = useBottomTabBarHeight();
   const { listBottomPadding, scrollToBottomBottom } = useChatComposerLayout(tabBarHeight);
 
@@ -329,93 +312,9 @@ export default function ChatScreen() {
     [client, updateStreamingMessage, remoteSessions.touchSession, appendSystemError, t]
   );
 
-  const startDeepSeekReply = useCallback(
-    async (
-      botMessageId: string,
-      apiMessages: ReturnType<typeof buildChatApiMessages>
-    ) => {
-      if (!apiKey) {
-        return;
-      }
-
-      streamingMessageIdRef.current = botMessageId;
-      setIsStreaming(true);
-
-      let content = "";
-      let reasoningContent = "";
-
-      await streamDeepSeekChat({
-        apiKey,
-        model,
-        messages: apiMessages,
-        thinkingEnabled,
-        onDelta: (delta) => {
-          if (delta.content) {
-            content += delta.content;
-          }
-          if (delta.reasoningContent) {
-            reasoningContent += delta.reasoningContent;
-          }
-          updateStreamingMessage(botMessageId, {
-            text: content,
-            reasoningContent: reasoningContent || undefined,
-            isPending: false,
-          });
-        },
-        onComplete: (usage) => {
-          streamingMessageIdRef.current = null;
-          setIsStreaming(false);
-
-          if (!content.trim() && !reasoningContent.trim()) {
-            updateStreamingMessage(botMessageId, {
-              text: t("chat.emptyReply"),
-              isPending: false,
-            });
-          }
-
-          const sessionId = activeSessionIdRef.current;
-          if (sessionId) {
-            setMessages((prev) => {
-              void persistMessages(sessionId, prev);
-              return prev;
-            });
-            void localSessions.touchSession(sessionId, { model });
-          }
-
-          if (usage) {
-            void addTokenUsage(usage);
-          }
-        },
-        onError: (error) => {
-          streamingMessageIdRef.current = null;
-          setIsStreaming(false);
-          appendSystemError(botMessageId, formatChatErrorMessage(error));
-        },
-      });
-    },
-    [
-      apiKey,
-      model,
-      thinkingEnabled,
-      updateStreamingMessage,
-      persistMessages,
-      localSessions.touchSession,
-      appendSystemError,
-      t,
-    ]
-  );
-
   const onSend = useCallback(
     (newMessages: AppChatMessage[] = []) => {
-      if (!canChat) {
-        if (!hasApiKey) {
-          router.push("/settings/api-key");
-        } else {
-          void connect();
-        }
-        return;
-      }
-      if (isStreaming) {
+      if (!canChat || isStreaming) {
         return;
       }
 
@@ -436,73 +335,43 @@ export default function ChatScreen() {
       void (async () => {
         let sessionId = activeSessionIdRef.current;
 
-        if (useMinibotPath) {
-          try {
-            if (!sessionId) {
-              const created = await remoteSessions.createSession();
-              sessionId = created.id;
-              activeSessionIdRef.current = sessionId;
-            }
-          } catch (error) {
-            appendSystemError(
-              botMessageId,
-              error instanceof Error
-                ? error.message
-                : t("chat.createSessionFailed")
-            );
-            return;
+        try {
+          if (!sessionId) {
+            const created = await remoteSessions.createSession();
+            sessionId = created.id;
+            activeSessionIdRef.current = sessionId;
           }
-
-          if (isDefaultChatTitle(activeSession?.title)) {
-            remoteSessions.touchSession(sessionId, {
-              title: titleFromUserText(firstUserText, newChatTitle),
-            });
-          }
-
-          setMessages((prevMessages) => {
-            const withUser = GiftedChat.append(prevMessages, newMessages);
-            const next = GiftedChat.append(withUser, [placeholder]);
-            return next;
-          });
-          startMinibotReply(sessionId, botMessageId, firstUserText);
-          return;
-        }
-
-        if (!sessionId) {
+        } catch (error) {
+          appendSystemError(
+            botMessageId,
+            error instanceof Error
+              ? error.message
+              : t("chat.createSessionFailed")
+          );
           return;
         }
 
         if (isDefaultChatTitle(activeSession?.title)) {
-          void localSessions.touchSession(sessionId, {
+          remoteSessions.touchSession(sessionId, {
             title: titleFromUserText(firstUserText, newChatTitle),
-            model,
           });
         }
 
         setMessages((prevMessages) => {
           const withUser = GiftedChat.append(prevMessages, newMessages);
-          const apiMessages = buildChatApiMessages(withUser);
-          void startDeepSeekReply(botMessageId, apiMessages);
           const next = GiftedChat.append(withUser, [placeholder]);
-          void persistMessages(sessionId!, next);
           return next;
         });
+        startMinibotReply(sessionId, botMessageId, firstUserText);
       })();
     },
     [
       canChat,
-      hasApiKey,
-      connect,
-      useMinibotPath,
       isStreaming,
       activeSession?.title,
-      model,
       remoteSessions.createSession,
       remoteSessions.touchSession,
-      localSessions.touchSession,
       startMinibotReply,
-      startDeepSeekReply,
-      persistMessages,
       appendSystemError,
       newChatTitle,
       t,
@@ -568,7 +437,7 @@ export default function ChatScreen() {
       }
       return;
     }
-    const session = await localSessions.createSession(model);
+    const session = await localSessions.createSession();
     setMessages(withWelcome([], welcomeText));
     activeSessionIdRef.current = session.id;
     setMessagesReady(true);
@@ -577,7 +446,6 @@ export default function ChatScreen() {
     useMinibotPath,
     remoteSessions.createSession,
     localSessions.createSession,
-    model,
     appendSystemError,
     welcomeText,
     t,
@@ -606,7 +474,7 @@ export default function ChatScreen() {
     []
   );
 
-  if (isLoading || !sessionsReady || !messagesReady) {
+  if (!sessionsReady || !messagesReady) {
     return (
       <View
         style={[
@@ -615,59 +483,6 @@ export default function ChatScreen() {
         ]}
       >
         <ActivityIndicator size="large" color={theme.primary} />
-      </View>
-    );
-  }
-
-  if (!canChat) {
-    return (
-      <View
-        style={[
-          styles.centered,
-          {
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom + 100,
-            backgroundColor: theme.background,
-          },
-        ]}
-      >
-        <View
-          style={[
-            styles.emptyCard,
-            { backgroundColor: theme.card, borderColor: theme.border },
-          ]}
-        >
-          <AppIcon icon={Server} size={40} color={theme.primary} />
-          <ThemedText type="defaultSemiBold" style={styles.emptyTitle}>
-            {t("chat.noServerTitle")}
-          </ThemedText>
-          <ThemedText type="secondary" style={styles.emptyText}>
-            {t("chat.noServerBody")}
-          </ThemedText>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void refreshConfigAndReconnect()}
-            style={({ pressed }) => [
-              styles.settingsButton,
-              { backgroundColor: theme.primary },
-              pressed && styles.buttonPressed,
-            ]}
-          >
-            <ThemedText style={[styles.settingsButtonText, { color: theme.onPrimary }]}>
-              {t("chat.connectServer")}
-            </ThemedText>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push("/settings/api-key")}
-            style={({ pressed }) => [styles.secondaryLink, pressed && styles.buttonPressed]}
-          >
-            <AppIcon icon={Key} size={16} color={theme.primary} />
-            <ThemedText style={[styles.secondaryLinkText, { color: theme.primary }]}>
-              {t("chat.configureApiKey")}
-            </ThemedText>
-          </Pressable>
-        </View>
       </View>
     );
   }
@@ -686,13 +501,6 @@ export default function ChatScreen() {
         return { label: t("chat.minibotOffline"), tone: "off" as const };
     }
   })();
-  const connectionLabel = useMinibotPath
-    ? modelName
-      ? `minibot · ${modelName}`
-      : headerStatus.label
-    : hasApiKey
-      ? t("chat.deepseekDirect")
-      : headerStatus.label;
 
   return (
     <ChatSessionDrawer
@@ -717,13 +525,9 @@ export default function ChatScreen() {
             title={displayChatTitle(activeSession?.title, newChatTitle)}
             onOpenDrawer={() => setDrawerOpen(true)}
             onNewSession={() => void handleNewSession()}
-            connectionLabel={connectionLabel}
-            connectionTone={
-              useMinibotPath ? "ok" : hasApiKey ? "warn" : headerStatus.tone
-            }
-            onPressConnection={() => void refreshConfigAndReconnect()}
+            connectionLabel={headerStatus.label}
+            connectionTone={headerStatus.tone}
           />
-          {!useMinibotPath ? <ChatPreferencesBar /> : null}
           <GiftedChat
             messages={messages}
             onSend={onSend}
@@ -769,7 +573,7 @@ export default function ChatScreen() {
             theme={theme}
             colorScheme={colorScheme}
             isStreaming={isStreaming}
-            onAbort={useMinibotPath ? handleAbort : undefined}
+            onAbort={handleAbort}
           />
         </View>
       </View>
@@ -789,43 +593,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
-  },
-  emptyCard: {
-    width: "100%",
-    borderRadius: 20,
-    padding: 24,
-    alignItems: "center",
-    gap: 12,
-    borderWidth: 1,
-  },
-  emptyTitle: {
-    fontSize: 20,
-  },
-  emptyText: {
-    textAlign: "center",
-  },
-  settingsButton: {
-    marginTop: 8,
-    borderRadius: 14,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  settingsButtonText: {
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  secondaryLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 4,
-    paddingVertical: 8,
-  },
-  secondaryLinkText: {
-    fontWeight: "600",
-  },
-  buttonPressed: {
-    opacity: 0.88,
   },
   scrollToBottomButton: {
     opacity: 1,

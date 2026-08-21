@@ -3,7 +3,10 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@minibot/ui": ["./packages/ui/src/index.ts"],
+      "@minibot/ui/*": ["./packages/ui/src/*"],
+      "@mini-auth/auth-rn": ["../mini-auth/frontend/packages/auth-rn/src/index.ts"]
     }
   },
   "include": [

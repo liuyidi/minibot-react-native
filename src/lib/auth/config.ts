@@ -6,6 +6,7 @@ import type { AuthUser, StoredAuthSession } from "@/types/auth";
 const ACCESS_TOKEN_KEY = "chat_api_access_token";
 const REFRESH_TOKEN_KEY = "chat_api_refresh_token";
 const SESSION_META_KEY = "chat_api_session_meta";
+const GUEST_MODE_KEY = "@minibot/guestMode";
 
 type SessionMeta = {
   user: AuthUser;
@@ -86,6 +87,19 @@ export async function clearAuthSession(): Promise<void> {
     SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
     AsyncStorage.removeItem(SESSION_META_KEY),
   ]);
+}
+
+export async function getGuestMode(): Promise<boolean> {
+  const raw = await AsyncStorage.getItem(GUEST_MODE_KEY);
+  return raw === "1";
+}
+
+export async function setGuestMode(enabled: boolean): Promise<void> {
+  if (enabled) {
+    await AsyncStorage.setItem(GUEST_MODE_KEY, "1");
+    return;
+  }
+  await AsyncStorage.removeItem(GUEST_MODE_KEY);
 }
 
 export function isAccessTokenExpired(expiresAt: number, skewMs = 60_000): boolean {

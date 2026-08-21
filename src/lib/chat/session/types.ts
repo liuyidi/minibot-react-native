@@ -1,4 +1,3 @@
-import type { DeepSeekModelId } from "@/lib/chat/preferencesConfig";
 import { en, zh } from "@/lib/i18n/messages";
 import type { AppChatMessage } from "@/types/chat";
 
@@ -7,7 +6,6 @@ export type ChatSession = {
   title: string;
   createdAt: number;
   updatedAt: number;
-  model?: DeepSeekModelId;
   /** When set, session is backed by minibot (`id` === WS chat_id). */
   source?: "local" | "minibot";
   /** Full session key, e.g. `websocket:<id>`. */

@@ -50,7 +50,7 @@ export async function setActiveSessionId(sessionId: string): Promise<void> {
 }
 
 export async function createChatSession(
-  partial?: Partial<Pick<ChatSession, "title" | "model">>
+  partial?: Partial<Pick<ChatSession, "title">>
 ): Promise<ChatSession> {
   const now = Date.now();
   const session: ChatSession = {
@@ -58,7 +58,6 @@ export async function createChatSession(
     title: partial?.title?.trim() || defaultChatTitle("zh"),
     createdAt: now,
     updatedAt: now,
-    model: partial?.model,
   };
   const sessions = await listChatSessions();
   await writeSessions([session, ...sessions]);
@@ -69,7 +68,7 @@ export async function createChatSession(
 
 export async function updateChatSession(
   sessionId: string,
-  patch: Partial<Pick<ChatSession, "title" | "updatedAt" | "model">>
+  patch: Partial<Pick<ChatSession, "title" | "updatedAt">>
 ): Promise<ChatSession | null> {
   const sessions = await listChatSessions();
   const index = sessions.findIndex((session) => session.id === sessionId);

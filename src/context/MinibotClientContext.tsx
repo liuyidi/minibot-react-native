@@ -16,6 +16,7 @@ import {
 import { Platform } from "react-native";
 
 import { WebViewWebSocketHost } from "@/components/WebViewWebSocketHost";
+import { useAuth } from "@/context/AuthContext";
 import {
   getMinibotAuthSecret,
   getMinibotAutoConnect,
@@ -40,8 +41,12 @@ type MinibotContextValue = {
 const MinibotContext = createContext<MinibotContextValue | null>(null);
 
 export function MinibotProvider({ children }: { children: ReactNode }) {
+  const { getAccessToken, isAuthenticated, isGuest, isReady: authReady } = useAuth();
   const clientRef = useRef<MinibotClient | null>(null);
   const connectGenRef = useRef(0);
+  const getAccessTokenRef = useRef(getAccessToken);
+  getAccessTokenRef.current = getAccessToken;
+
   const [client, setClient] = useState<MinibotClient | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("idle");
@@ -73,7 +78,16 @@ export function MinibotProvider({ children }: { children: ReactNode }) {
 
     const next = createClient({
       baseUrl: url,
-      getSecret: () => secret || undefined,
+      // Secret wins (power-user); otherwise mini-auth access token as Bearer.
+      getSecret: async () => {
+        const s = await getMinibotAuthSecret();
+        return s || undefined;
+      },
+      getAccessToken: async () => {
+        const s = await getMinibotAuthSecret();
+        if (s) return undefined;
+        return (await getAccessTokenRef.current()) ?? undefined;
+      },
       reconnect: true,
       debug: __DEV__,
       // iOS Expo Go: SocketRocket aborts WSS TLS (OSStatus -9806). Use WebKit.
@@ -132,7 +146,11 @@ export function MinibotProvider({ children }: { children: ReactNode }) {
   const disconnect = useCallback(() => {
     connectGenRef.current += 1;
     teardownWs();
+    clientRef.current = null;
+    setClient(null);
     setStatus("closed");
+    setModelName(null);
+    setRuntimeSurface(null);
     setLastError(null);
   }, [teardownWs]);
 
@@ -140,32 +158,54 @@ export function MinibotProvider({ children }: { children: ReactNode }) {
     await connect();
   }, [connect]);
 
+  // Connect only after auth is ready, and when the user can access the app
+  // (logged-in Bearer, guest anonymous, or optional gateway secret).
   useEffect(() => {
     let cancelled = false;
-    const genAtStart = connectGenRef.current;
+
     void (async () => {
+      if (!authReady) return;
+
       const url = await getMinibotBaseUrl();
       if (cancelled) return;
       setBaseUrl(url);
+
       const auto = await getMinibotAutoConnect();
-      if (cancelled) return;
-      if (auto) {
-        try {
-          await connect();
-        } catch {
-          // surfaced via lastError / status
-        }
+      const secret = await getMinibotAuthSecret();
+      const shouldConnect =
+        auto && (isAuthenticated || isGuest || Boolean(secret.trim()));
+
+      if (!shouldConnect) {
+        disconnect();
+        if (!cancelled) setIsReady(true);
+        return;
       }
-      if (!cancelled && connectGenRef.current >= genAtStart) {
-        setIsReady(true);
+
+      try {
+        await connect();
+      } catch {
+        // surfaced via lastError / status
       }
+      if (!cancelled) setIsReady(true);
     })();
+
     return () => {
       cancelled = true;
+    };
+  }, [
+    authReady,
+    isAuthenticated,
+    isGuest,
+    connect,
+    disconnect,
+  ]);
+
+  useEffect(() => {
+    return () => {
       connectGenRef.current += 1;
       teardownWs();
     };
-  }, [connect, teardownWs]);
+  }, [teardownWs]);
 
   const value = useMemo<MinibotContextValue>(
     () => ({

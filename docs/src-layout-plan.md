@@ -58,7 +58,8 @@ minibot-react-native/
     │
     └── lib/               # 按域收拢
         ├── minibot/
-        ├── deepseek/      # 过渡期
+        ├── auth/          # mini-auth session / OTP
+        # (deepseek/ 已删除)
         ├── auth/
         ├── chat/          # 含 session/
         ├── settings/
@@ -72,7 +73,7 @@ minibot-react-native/
 |------|------|
 | `/app` | `/src/app` |
 | `/components`、`/context`、`/hooks`、`/constants`、`/types`、`/lib` | `/src/…` 同名 |
-| `/lib/*.ts` 平铺 | `/src/lib/{minibot,deepseek,auth,chat,settings,i18n,theme}` |
+| `/lib/*.ts` 平铺 | `/src/lib/{minibot,auth,chat,settings,i18n,theme}` |
 | `/assets`、`/docs`、`/scripts`、`android`、`ios` | 仍在根 |
 | `app.ts`（备用入口） | 已删除，逻辑并入 `index.tsx` |
 | `screenshot/` | 仓库中不存在，跳过 |

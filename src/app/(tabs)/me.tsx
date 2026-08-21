@@ -1,12 +1,8 @@
 import {
-  BarChart3,
-  Box,
   ChevronRight,
   CircleUser,
   Info,
-  Key,
   Languages,
-  Lightbulb,
   Palette,
 } from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
@@ -18,7 +14,6 @@ import { AppIcon } from "@/components/ui/AppIcon";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
 import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
 import { ThemedText } from "@/components/ThemedText";
-import { useChatPreferences } from "@/context/ChatPreferencesContext";
 import { useAppearance } from "@/context/AppearanceContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -32,9 +27,6 @@ import {
 } from "@/lib/settings/accountConfig";
 import { LANGUAGE_LABELS } from "@/lib/i18n/languageLabels";
 import { getAppVersion } from "@/lib/settings/appVersion";
-import { MODEL_LABELS } from "@/lib/settings/modelLabels";
-import { getDeepSeekApiKey, maskApiKey } from "@/lib/deepseek/config";
-import { formatTokenCount, getTokenUsageStats } from "@/lib/settings/tokenUsageConfig";
 import {
   getProfileInitial,
   getUserProfile,
@@ -49,13 +41,10 @@ export default function SettingsHubScreen() {
   const { t } = useLanguage();
   const { mode: appearanceMode, setMode, themeDefinition } = useAppearance();
   const { language } = useLanguage();
-  const { model, isThinkingActive } = useChatPreferences();
   const { user: authUser, logout } = useAuth();
-  const { status: minibotStatus, isConnected, modelName } = useMinibot();
+  const { status: minibotStatus, isConnected } = useMinibot();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [account, setAccount] = useState<AccountInfo | null>(null);
-  const [apiKeySummary, setApiKeySummary] = useState("—");
-  const [usageSummary, setUsageSummary] = useState("0");
 
   const statusLabel = (status: string) => {
     switch (status) {
@@ -88,16 +77,12 @@ export default function SettingsHubScreen() {
   };
 
   const loadPreviewData = useCallback(async () => {
-    const [nextProfile, nextAccount, apiKey, usageStats] = await Promise.all([
+    const [nextProfile, nextAccount] = await Promise.all([
       getUserProfile(),
       getAccountInfo(),
-      getDeepSeekApiKey(),
-      getTokenUsageStats(),
     ]);
     setProfile(nextProfile);
     setAccount(nextAccount);
-    setApiKeySummary(apiKey ? maskApiKey(apiKey) : "—");
-    setUsageSummary(formatTokenCount(usageStats.totalTokens));
   }, []);
 
   useFocusEffect(
@@ -139,9 +124,7 @@ export default function SettingsHubScreen() {
         : t("me.unbound");
 
   const serverValue = isConnected
-    ? modelName
-      ? t("me.connectedWithModel", { model: modelName })
-      : t("me.statusOpen")
+    ? t("me.statusOpen")
     : statusLabel(minibotStatus);
 
   const connectionTone = isConnected ? theme.green : theme.textSecondary;
@@ -203,20 +186,8 @@ export default function SettingsHubScreen() {
             title={t("me.language")}
             value={LANGUAGE_LABELS[language]}
             icon={Languages}
-            onPress={() => router.push("/settings/language")}
-          />
-          <SettingsNavRow
-            title={t("me.model")}
-            value={MODEL_LABELS[model]}
-            icon={Box}
-            onPress={() => router.push("/settings/model")}
-          />
-          <SettingsNavRow
-            title={t("me.thinking")}
-            value={isThinkingActive ? t("common.on") : t("common.off")}
-            icon={Lightbulb}
             showDivider={false}
-            onPress={() => router.push("/settings/thinking")}
+            onPress={() => router.push("/settings/language")}
           />
         </SettingsGroup>
 
@@ -225,20 +196,8 @@ export default function SettingsHubScreen() {
             title={t("me.account")}
             value={accountHubValue}
             icon={CircleUser}
-            onPress={() => router.push("/settings/account")}
-          />
-          <SettingsNavRow
-            title={t("me.apiKey")}
-            value={apiKeySummary}
-            icon={Key}
-            onPress={() => router.push("/settings/api-key")}
-          />
-          <SettingsNavRow
-            title={t("me.usage")}
-            value={usageSummary}
-            icon={BarChart3}
             showDivider={false}
-            onPress={() => router.push("/settings/usage")}
+            onPress={() => router.push("/settings/account")}
           />
         </SettingsGroup>
 
