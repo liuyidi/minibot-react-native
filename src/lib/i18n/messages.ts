@@ -203,6 +203,16 @@ export type MessageCatalog = {
     openList: string;
     edgeOpen: string;
     serverStatus: string;
+    pinned: string;
+    pin: string;
+    unpin: string;
+    rename: string;
+    delete: string;
+    renameTitle: string;
+    renamePlaceholder: string;
+    deleteConfirmTitle: string;
+    deleteConfirmBody: string;
+    historyRetention: string;
   };
   about: {
     checkUpdate: string;
@@ -453,7 +463,7 @@ export const zh: MessageCatalog = {
     hide: "隐藏",
   },
   drawer: {
-    sessions: "会话",
+    sessions: "会话历史",
     history: "历史（按最近更新）",
     empty: "暂无会话",
     close: "关闭",
@@ -461,6 +471,16 @@ export const zh: MessageCatalog = {
     openList: "打开会话列表",
     edgeOpen: "从左边缘滑动打开会话列表",
     serverStatus: "服务器状态：{label}",
+    pinned: "置顶",
+    pin: "置顶",
+    unpin: "取消置顶",
+    rename: "重命名",
+    delete: "删除",
+    renameTitle: "重命名会话",
+    renamePlaceholder: "输入会话标题",
+    deleteConfirmTitle: "删除会话",
+    deleteConfirmBody: "确定删除「{title}」？此操作不可撤销。",
+    historyRetention: "—— 为你保留最近 90 天历史记录 ——",
   },
   about: {
     checkUpdate: "版本更新",
@@ -714,7 +734,7 @@ export const en: MessageCatalog = {
     hide: "Hide",
   },
   drawer: {
-    sessions: "Sessions",
+    sessions: "Session history",
     history: "History (recent first)",
     empty: "No sessions yet",
     close: "Close",
@@ -722,6 +742,16 @@ export const en: MessageCatalog = {
     openList: "Open sessions",
     edgeOpen: "Swipe from the left edge to open sessions",
     serverStatus: "Server status: {label}",
+    pinned: "Pinned",
+    pin: "Pin",
+    unpin: "Unpin",
+    rename: "Rename",
+    delete: "Delete",
+    renameTitle: "Rename session",
+    renamePlaceholder: "Session title",
+    deleteConfirmTitle: "Delete session",
+    deleteConfirmBody: "Delete “{title}”? This cannot be undone.",
+    historyRetention: "—— Keeping the last 90 days of history ——",
   },
   about: {
     checkUpdate: "Check for updates",

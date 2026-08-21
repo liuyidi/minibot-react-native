@@ -111,6 +111,9 @@ export default function ChatScreen() {
   });
 
   const sessions = useMinibotPath ? remoteSessions.sessions : localSessions.sessions;
+  const pinnedKeys = useMinibotPath
+    ? remoteSessions.pinnedKeys
+    : localSessions.pinnedKeys;
   const activeSession = useMinibotPath
     ? remoteSessions.activeSession
     : localSessions.activeSession;
@@ -415,6 +418,52 @@ export default function ChatScreen() {
     setComposerText("");
   }, [composerText, isStreaming, onSend]);
 
+  const handleTogglePin = useCallback(
+    (session: (typeof sessions)[number]) => {
+      if (useMinibotPath) {
+        void remoteSessions.togglePin(session);
+      } else {
+        void localSessions.togglePin(session);
+      }
+    },
+    [useMinibotPath, remoteSessions.togglePin, localSessions.togglePin]
+  );
+
+  const handleRenameSession = useCallback(
+    (session: (typeof sessions)[number], title: string) => {
+      if (useMinibotPath) {
+        void remoteSessions.renameSession(session, title);
+      } else {
+        void localSessions.renameSession(session.id, title);
+      }
+    },
+    [useMinibotPath, remoteSessions.renameSession, localSessions.renameSession]
+  );
+
+  const handleDeleteSession = useCallback(
+    (session: (typeof sessions)[number]) => {
+      void (async () => {
+        if (isStreaming) return;
+        if (useMinibotPath) {
+          await remoteSessions.removeSession(session);
+        } else {
+          await localSessions.removeSession(session.id);
+        }
+        if (session.id === activeSessionIdRef.current) {
+          setMessages(withWelcome([], welcomeText));
+          setMessagesReady(true);
+        }
+      })();
+    },
+    [
+      isStreaming,
+      useMinibotPath,
+      remoteSessions.removeSession,
+      localSessions.removeSession,
+      welcomeText,
+    ]
+  );
+
   const handleAbort = useCallback(() => {
     turnControlRef.current?.abort();
     setPendingApproval(null);
@@ -552,9 +601,13 @@ export default function ChatScreen() {
       open={drawerOpen}
       sessions={sessions}
       activeSessionId={activeSessionId}
+      pinnedKeys={pinnedKeys}
       onOpenChange={setDrawerOpen}
       onSelectSession={(sessionId) => void handleSelectSession(sessionId)}
       onNewSession={() => void handleNewSession()}
+      onTogglePin={handleTogglePin}
+      onRenameSession={handleRenameSession}
+      onDeleteSession={handleDeleteSession}
     >
       <View
         style={[

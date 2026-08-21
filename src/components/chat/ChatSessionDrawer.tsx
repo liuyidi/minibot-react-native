@@ -1,6 +1,7 @@
-import { Menu, MessageSquarePlus, X } from "lucide-react-native";
-import { useCallback, useEffect } from "react";
+import { Menu, MessageSquare, MessageSquarePlus, Pin, X } from "lucide-react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -22,10 +23,19 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { RenameSessionModal } from "@/components/chat/RenameSessionModal";
+import {
+  SessionActionMenu,
+  type SessionActionMenuTarget,
+} from "@/components/chat/SessionActionMenu";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { ThemedText } from "@/components/ThemedText";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import {
+  groupSessionsByDate,
+  sortSessionsForDrawer,
+} from "@/lib/chat/groupSessionsByDate";
 import type { ChatSession } from "@/lib/chat/session/types";
 import { displayChatTitle } from "@/lib/chat/session/types";
 
@@ -39,51 +49,110 @@ function getDrawerWidth(screenWidth: number): number {
   return Math.min(Math.round(screenWidth * 0.78), 320);
 }
 
-function formatSessionTime(timestamp: number, locale: string): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const sameDay =
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate();
-
-  if (sameDay) {
-    return date.toLocaleTimeString(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  const sameYear = date.getFullYear() === now.getFullYear();
-  return date.toLocaleDateString(locale, {
-    month: "numeric",
-    day: "numeric",
-    ...(sameYear ? {} : { year: "numeric" }),
-  });
+function sessionKey(session: ChatSession): string {
+  return session.key || `websocket:${session.id}`;
 }
 
 type SessionPanelProps = {
   width: number;
   sessions: ChatSession[];
   activeSessionId: string | null;
+  pinnedKeys: string[];
   onClose: () => void;
   onSelectSession: (sessionId: string) => void;
   onNewSession: () => void;
+  onTogglePin: (session: ChatSession) => void;
+  onRenameSession: (session: ChatSession, title: string) => void;
+  onDeleteSession: (session: ChatSession) => void;
 };
 
 function SessionPanel({
   width,
   sessions,
   activeSessionId,
+  pinnedKeys,
   onClose,
   onSelectSession,
   onNewSession,
+  onTogglePin,
+  onRenameSession,
+  onDeleteSession,
 }: SessionPanelProps) {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { t, language } = useLanguage();
-  const locale = language === "en" ? "en-US" : "zh-CN";
   const newChatTitle = t("chat.newChat");
+  const pinnedSet = useMemo(() => new Set(pinnedKeys), [pinnedKeys]);
+
+  const { pinned, unpinned } = useMemo(
+    () => sortSessionsForDrawer(sessions, pinnedSet),
+    [sessions, pinnedSet]
+  );
+  const dateGroups = useMemo(
+    () => groupSessionsByDate(unpinned, language),
+    [unpinned, language]
+  );
+
+  const [menuTarget, setMenuTarget] = useState<SessionActionMenuTarget | null>(
+    null
+  );
+  const [renameTarget, setRenameTarget] = useState<ChatSession | null>(null);
+
+  const menuSession = useMemo(
+    () =>
+      menuTarget
+        ? sessions.find((s) => s.id === menuTarget.id) ?? null
+        : null,
+    [menuTarget, sessions]
+  );
+
+  const openMenu = useCallback(
+    (session: ChatSession) => {
+      setMenuTarget({
+        id: session.id,
+        title: displayChatTitle(session.title, newChatTitle),
+        pinned: pinnedSet.has(sessionKey(session)),
+      });
+    },
+    [newChatTitle, pinnedSet]
+  );
+
+  const renderRow = (session: ChatSession) => {
+    const isActive = session.id === activeSessionId;
+    const isPinned = pinnedSet.has(sessionKey(session));
+    return (
+      <Pressable
+        key={session.id}
+        accessibilityRole="button"
+        accessibilityState={{ selected: isActive }}
+        onPress={() => onSelectSession(session.id)}
+        onLongPress={() => openMenu(session)}
+        delayLongPress={320}
+        style={({ pressed }) => [
+          styles.row,
+          {
+            backgroundColor: isActive ? theme.primary + "14" : "transparent",
+          },
+          pressed && styles.pressed,
+        ]}
+      >
+        <AppIcon
+          icon={isPinned ? Pin : MessageSquare}
+          size={16}
+          color={isActive ? theme.primary : theme.textSecondary}
+        />
+        <ThemedText
+          numberOfLines={1}
+          style={[
+            styles.rowTitle,
+            isActive ? { color: theme.primary, fontWeight: "600" } : undefined,
+          ]}
+        >
+          {displayChatTitle(session.title, newChatTitle)}
+        </ThemedText>
+      </Pressable>
+    );
+  };
 
   return (
     <View
@@ -92,7 +161,7 @@ function SessionPanel({
         {
           width,
           paddingTop: insets.top + 8,
-          paddingBottom: insets.bottom + 16,
+          paddingBottom: insets.bottom + 12,
           backgroundColor: theme.background,
         },
       ]}
@@ -133,10 +202,6 @@ function SessionPanel({
         </ThemedText>
       </Pressable>
 
-      <ThemedText type="secondary" style={styles.sectionLabel}>
-        {t("drawer.history")}
-      </ThemedText>
-
       <ScrollView
         style={styles.list}
         contentContainerStyle={styles.listContent}
@@ -147,45 +212,76 @@ function SessionPanel({
             {t("drawer.empty")}
           </ThemedText>
         ) : (
-          sessions.map((session) => {
-            const isActive = session.id === activeSessionId;
-            return (
-              <Pressable
-                key={session.id}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isActive }}
-                onPress={() => onSelectSession(session.id)}
-                style={({ pressed }) => [
-                  styles.row,
-                  {
-                    backgroundColor: isActive
-                      ? theme.primary + "14"
-                      : theme.card,
-                    borderColor: isActive ? theme.primary + "40" : theme.border,
-                  },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <View style={styles.rowBody}>
-                  <ThemedText
-                    type="defaultSemiBold"
-                    numberOfLines={1}
-                    style={[
-                      styles.rowTitle,
-                      isActive ? { color: theme.primary } : undefined,
-                    ]}
-                  >
-                    {displayChatTitle(session.title, newChatTitle)}
-                  </ThemedText>
-                  <ThemedText type="secondary" style={styles.rowTime}>
-                    {formatSessionTime(session.updatedAt, locale)}
-                  </ThemedText>
-                </View>
-              </Pressable>
-            );
-          })
+          <>
+            {pinned.length > 0 ? (
+              <View style={styles.group}>
+                <ThemedText type="secondary" style={styles.dateLabel}>
+                  {t("drawer.pinned")}
+                </ThemedText>
+                {pinned.map(renderRow)}
+              </View>
+            ) : null}
+            {dateGroups.map((group) => (
+              <View key={group.id} style={styles.group}>
+                <ThemedText type="secondary" style={styles.dateLabel}>
+                  {group.label}
+                </ThemedText>
+                {group.sessions.map(renderRow)}
+              </View>
+            ))}
+          </>
         )}
+        <ThemedText type="secondary" style={styles.footerHint}>
+          {t("drawer.historyRetention")}
+        </ThemedText>
       </ScrollView>
+
+      <SessionActionMenu
+        target={menuTarget}
+        onClose={() => setMenuTarget(null)}
+        onPin={() => {
+          if (menuSession) onTogglePin(menuSession);
+          setMenuTarget(null);
+        }}
+        onRename={() => {
+          if (menuSession) setRenameTarget(menuSession);
+          setMenuTarget(null);
+        }}
+        onDelete={() => {
+          const session = menuSession;
+          setMenuTarget(null);
+          if (!session) return;
+          const title = displayChatTitle(session.title, newChatTitle);
+          Alert.alert(
+            t("drawer.deleteConfirmTitle"),
+            t("drawer.deleteConfirmBody", { title }),
+            [
+              { text: t("common.cancel"), style: "cancel" },
+              {
+                text: t("drawer.delete"),
+                style: "destructive",
+                onPress: () => onDeleteSession(session),
+              },
+            ]
+          );
+        }}
+      />
+
+      <RenameSessionModal
+        visible={Boolean(renameTarget)}
+        initialTitle={
+          renameTarget
+            ? displayChatTitle(renameTarget.title, newChatTitle)
+            : ""
+        }
+        onCancel={() => setRenameTarget(null)}
+        onSubmit={(title) => {
+          if (renameTarget && title) {
+            onRenameSession(renameTarget, title);
+          }
+          setRenameTarget(null);
+        }}
+      />
     </View>
   );
 }
@@ -194,9 +290,13 @@ type ChatSessionDrawerProps = {
   open: boolean;
   sessions: ChatSession[];
   activeSessionId: string | null;
+  pinnedKeys?: string[];
   onOpenChange: (open: boolean) => void;
   onSelectSession: (sessionId: string) => void;
   onNewSession: () => void;
+  onTogglePin?: (session: ChatSession) => void;
+  onRenameSession?: (session: ChatSession, title: string) => void;
+  onDeleteSession?: (session: ChatSession) => void;
   children: React.ReactNode;
 };
 
@@ -205,9 +305,13 @@ export function ChatSessionDrawer({
   open,
   sessions,
   activeSessionId,
+  pinnedKeys = [],
   onOpenChange,
   onSelectSession,
   onNewSession,
+  onTogglePin,
+  onRenameSession,
+  onDeleteSession,
   children,
 }: ChatSessionDrawerProps) {
   const theme = useAppTheme();
@@ -317,9 +421,13 @@ export function ChatSessionDrawer({
           width={drawerWidth}
           sessions={sessions}
           activeSessionId={activeSessionId}
+          pinnedKeys={pinnedKeys}
           onClose={() => onOpenChange(false)}
           onSelectSession={onSelectSession}
           onNewSession={onNewSession}
+          onTogglePin={onTogglePin ?? (() => {})}
+          onRenameSession={onRenameSession ?? (() => {})}
+          onDeleteSession={onDeleteSession ?? (() => {})}
         />
       </View>
 
@@ -440,13 +548,13 @@ const styles = StyleSheet.create({
   },
   panel: {
     flex: 1,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
   },
   panelHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 10,
     paddingHorizontal: 2,
   },
   headerTitle: {
@@ -487,42 +595,51 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 16,
+    paddingVertical: 10,
+    marginBottom: 12,
   },
   newButtonText: {
     fontSize: 15,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    marginBottom: 8,
-    paddingHorizontal: 4,
   },
   list: {
     flex: 1,
   },
   listContent: {
-    gap: 6,
-    paddingBottom: 24,
+    paddingBottom: 16,
+    gap: 14,
+  },
+  group: {
+    gap: 2,
+  },
+  dateLabel: {
+    fontSize: 12,
+    paddingHorizontal: 8,
+    paddingBottom: 4,
+    paddingTop: 2,
   },
   empty: {
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
     paddingTop: 8,
   },
   row: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-  },
-  rowBody: {
-    gap: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    minHeight: 36,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 7,
   },
   rowTitle: {
-    fontSize: 15,
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 18,
   },
-  rowTime: {
-    fontSize: 12,
+  footerHint: {
+    textAlign: "center",
+    fontSize: 11,
+    marginTop: 8,
+    paddingHorizontal: 8,
   },
   pressed: {
     opacity: 0.72,
