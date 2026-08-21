@@ -103,6 +103,13 @@ export type MessageCatalog = {
     createSessionFailed: string;
     stopGeneration: string;
     send: string;
+    toolsProgress: string;
+    approvalTitle: string;
+    approvalApprove: string;
+    approvalReject: string;
+    approvalReason: string;
+    approvalRisk: string;
+    approvalTools: string;
   };
   server: {
     title: string;
@@ -354,6 +361,13 @@ export const zh: MessageCatalog = {
     createSessionFailed: "创建会话失败",
     stopGeneration: "停止生成",
     send: "发送",
+    toolsProgress: "工具进度",
+    approvalTitle: "需要确认",
+    approvalApprove: "批准",
+    approvalReject: "拒绝",
+    approvalReason: "原因：{reason}",
+    approvalRisk: "风险：{risk}",
+    approvalTools: "工具：{tools}",
   },
   server: {
     title: "Minibot 服务器",
@@ -607,6 +621,13 @@ export const en: MessageCatalog = {
     createSessionFailed: "Failed to create session",
     stopGeneration: "Stop generating",
     send: "Send",
+    toolsProgress: "Tools",
+    approvalTitle: "Approval needed",
+    approvalApprove: "Approve",
+    approvalReject: "Reject",
+    approvalReason: "Reason: {reason}",
+    approvalRisk: "Risk: {risk}",
+    approvalTools: "Tools: {tools}",
   },
   server: {
     title: "Minibot server",

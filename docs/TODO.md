@@ -31,7 +31,7 @@
 
 | 模块 | 当前状态 |
 |------|----------|
-| 聊天 | **仅 minibot WS**（newChat / attach / delta / turn_end / abort）；未连接不可发消息 |
+| 聊天 | **仅 minibot WS**（delta / reasoning / **tool_hint·progress** / **HITL approval** / turn_end / abort）；GiftedChat 暂留，完整 Agent Timeline 延后 |
 | 传输 | `@minibot/client`：bootstrap + REST sessions + WS multiplex |
 | 会话 | 已连接：远端 `sessions.list` + `getThread`；离线：本地 AsyncStorage 草稿 |
 | 服务器设置 | 「关于」双击版本号 → Minibot 服务器：Base URL / Secret / 连接 / sessions 探测 |

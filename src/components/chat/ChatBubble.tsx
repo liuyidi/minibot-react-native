@@ -7,6 +7,7 @@ import {
 } from "react-native-gifted-chat";
 
 import { ChatMessageText } from "@/components/chat/ChatMessageText";
+import { ToolProgressCard } from "@/components/chat/ToolProgressCard";
 import { ThemedText } from "@/components/ThemedText";
 import type { AppChatMessage } from "@/types/chat";
 import { useLanguage } from "@/context/LanguageContext";
@@ -22,12 +23,14 @@ export function ChatBubble(props: ChatBubbleProps) {
   const { t } = useLanguage();
   const { currentMessage, isStreaming = false } = props;
   const reasoningContent = currentMessage?.reasoningContent?.trim();
+  const toolLines = currentMessage?.toolLines ?? [];
   const [isReasoningExpanded, setIsReasoningExpanded] = useState(false);
   const isAssistant = currentMessage?.user._id !== 1;
   const isPendingReply =
     isAssistant &&
     Boolean(currentMessage?.isPending) &&
-    isStreaming;
+    isStreaming &&
+    !toolLines.length;
 
   const renderMessageText = useCallback(
     (messageTextProps: RenderMessageTextProps<AppChatMessage>) => (
@@ -38,6 +41,9 @@ export function ChatBubble(props: ChatBubbleProps) {
 
   return (
     <View style={styles.wrap}>
+      {isAssistant && toolLines.length > 0 ? (
+        <ToolProgressCard lines={toolLines} />
+      ) : null}
       {isAssistant && reasoningContent ? (
         <View
           style={[

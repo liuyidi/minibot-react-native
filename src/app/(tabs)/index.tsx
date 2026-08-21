@@ -30,6 +30,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 import { AppIcon } from "@/components/ui/AppIcon";
+import { ApprovalCard } from "@/components/chat/ApprovalCard";
 import { ChatBubble } from "@/components/chat/ChatBubble";
 import {
   ChatHeader,
@@ -43,6 +44,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useMinibot } from "@/context/MinibotClientContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import type { PendingApproval } from "@/lib/minibot/wsTurn";
 import type { AppChatMessage } from "@/types/chat";
 
 function makeWelcome(text: string): AppChatMessage {
@@ -79,6 +81,9 @@ export default function ChatScreen() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [messagesReady, setMessagesReady] = useState(false);
+  const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(
+    null
+  );
   const streamingMessageIdRef = useRef<string | null>(null);
   const activeSessionIdRef = useRef<string | null>(null);
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -283,13 +288,28 @@ export default function ChatScreen() {
             isPending: false,
           });
         },
+        onToolProgress: (lines) => {
+          updateStreamingMessage(botMessageId, {
+            toolLines: lines,
+            isPending: false,
+          });
+        },
+        onApprovalRequired: (approval) => {
+          setPendingApproval(approval);
+        },
         onComplete: () => {
           turnControlRef.current = null;
           streamingMessageIdRef.current = null;
+          setPendingApproval(null);
           setIsStreaming(false);
           setMessages((prev) => {
             const current = prev.find((m) => String(m._id) === String(botMessageId));
-            if (current && !current.text?.trim() && !current.reasoningContent?.trim()) {
+            if (
+              current &&
+              !current.text?.trim() &&
+              !current.reasoningContent?.trim() &&
+              !(current.toolLines?.length)
+            ) {
               return prev.map((m) =>
                 String(m._id) === String(botMessageId)
                   ? { ...m, text: t("chat.emptyReply"), isPending: false }
@@ -303,6 +323,7 @@ export default function ChatScreen() {
         onError: (detail) => {
           turnControlRef.current = null;
           streamingMessageIdRef.current = null;
+          setPendingApproval(null);
           setIsStreaming(false);
           appendSystemError(botMessageId, detail);
         },
@@ -396,7 +417,30 @@ export default function ChatScreen() {
 
   const handleAbort = useCallback(() => {
     turnControlRef.current?.abort();
+    setPendingApproval(null);
   }, []);
+
+  const respondToApproval = useCallback(
+    (decision: "approve" | "reject") => {
+      if (!client || !pendingApproval) {
+        return;
+      }
+      try {
+        client.ws.send({
+          type: "approval_response",
+          approval_id: pendingApproval.id,
+          decision,
+        });
+      } catch (error) {
+        appendSystemError(
+          `approval_${Date.now()}`,
+          error instanceof Error ? error.message : "approval failed"
+        );
+      }
+      setPendingApproval(null);
+    },
+    [client, pendingApproval, appendSystemError]
+  );
 
   const handleSelectSession = useCallback(
     async (sessionId: string) => {
@@ -468,6 +512,7 @@ export default function ChatScreen() {
       return (
         currentMessage.text !== nextMessage.text ||
         currentMessage.reasoningContent !== nextMessage.reasoningContent ||
+        currentMessage.toolLines !== nextMessage.toolLines ||
         currentMessage.isPending !== nextMessage.isPending
       );
     },
@@ -566,6 +611,13 @@ export default function ChatScreen() {
             )}
             renderBubble={renderBubble}
           />
+          {pendingApproval ? (
+            <ApprovalCard
+              approval={pendingApproval}
+              onApprove={() => respondToApproval("approve")}
+              onReject={() => respondToApproval("reject")}
+            />
+          ) : null}
           <FloatingChatComposer
             text={composerText}
             onChangeText={setComposerText}
