@@ -1,4 +1,4 @@
-import { Mail, MessageCircle, Phone, Trash2 } from "lucide-react-native";
+import { Mail, Trash2 } from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { GitHubProviderIcon, GoogleProviderIcon } from "@/components/auth/ProviderIcons";
 import { EditFieldModal } from "@/components/settings/EditFieldModal";
 import { SettingsGroup } from "@/components/settings/SettingsGroup";
 import { SettingsNavRow } from "@/components/settings/SettingsNavRow";
@@ -17,27 +18,45 @@ import { useAuth } from "@/context/AuthContext";
 import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import {
+  EMPTY_IDENTITIES,
+  fetchUserIdentities,
+  type UserIdentities,
+} from "@/lib/auth/identities";
+import { deleteAccount } from "@/lib/auth/session";
+import {
   DEFAULT_ACCOUNT,
   getAccountInfo,
   maskEmail,
-  maskPhone,
   setAccountInfo,
   type AccountInfo,
 } from "@/lib/settings/accountConfig";
-import { deleteAccount } from "@/lib/auth/session";
 
 export default function AccountSettingsScreen() {
   const t = useT();
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { setMode } = useAppearance();
-  const { logout } = useAuth();
+  const { logout, getAccessToken, loginWithGoogle, loginWithGitHub } = useAuth();
   const [account, setAccount] = useState<AccountInfo>(DEFAULT_ACCOUNT);
-  const [editingField, setEditingField] = useState<"phone" | "email" | null>(null);
+  const [identities, setIdentities] = useState<UserIdentities>(EMPTY_IDENTITIES);
+  const [editingField, setEditingField] = useState<"email" | null>(null);
+  const [linkingProvider, setLinkingProvider] = useState<"google" | "github" | null>(
+    null
+  );
 
   const loadData = useCallback(async () => {
     setAccount(await getAccountInfo());
-  }, []);
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      setIdentities(EMPTY_IDENTITIES);
+      return;
+    }
+    try {
+      setIdentities(await fetchUserIdentities(accessToken));
+    } catch {
+      setIdentities(EMPTY_IDENTITIES);
+    }
+  }, [getAccessToken]);
 
   useFocusEffect(
     useCallback(() => {
@@ -50,11 +69,7 @@ export default function AccountSettingsScreen() {
     await setAccountInfo(next);
   };
 
-  const handleFieldSave = (field: "phone" | "email", value: string) => {
-    if (field === "phone" && value && !/^1\d{10}$/.test(value)) {
-      Alert.alert(t("account.invalidPhoneTitle"), t("account.invalidPhoneBody"));
-      return;
-    }
+  const handleFieldSave = (field: "email", value: string) => {
     if (field === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       Alert.alert(t("account.invalidEmailTitle"), t("account.invalidEmailBody"));
       return;
@@ -66,35 +81,40 @@ export default function AccountSettingsScreen() {
     setEditingField(null);
   };
 
-  const handleWechatBind = () => {
-    if (account.wechatBound) {
-      Alert.alert(t("account.unbindWechatTitle"), t("account.unbindWechatBody"), [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("account.unbind"),
-          style: "destructive",
-          onPress: () => {
-            void updateAccount({
-              ...account,
-              wechatBound: false,
-              wechatNickname: "",
-            });
-          },
-        },
-      ]);
+  const handleProviderBind = (provider: "google" | "github") => {
+    const isBound = provider === "google" ? identities.google : identities.github;
+    if (isBound) {
       return;
     }
 
-    Alert.alert(t("account.bindWechatTitle"), t("account.bindWechatBody"), [
+    const title =
+      provider === "google" ? t("account.bindGoogleTitle") : t("account.bindGithubTitle");
+    const body =
+      provider === "google" ? t("account.bindGoogleBody") : t("account.bindGithubBody");
+
+    Alert.alert(title, body, [
       { text: t("common.cancel"), style: "cancel" },
       {
         text: t("account.bind"),
         onPress: () => {
-          void updateAccount({
-            ...account,
-            wechatBound: true,
-            wechatNickname: t("account.wechatUser"),
-          });
+          void (async () => {
+            setLinkingProvider(provider);
+            try {
+              if (provider === "google") {
+                await loginWithGoogle();
+              } else {
+                await loginWithGitHub();
+              }
+              await loadData();
+            } catch (error) {
+              Alert.alert(
+                t("account.bindFailedTitle"),
+                error instanceof Error ? error.message : t("account.bindFailedBody")
+              );
+            } finally {
+              setLinkingProvider(null);
+            }
+          })();
         },
       },
     ]);
@@ -117,6 +137,9 @@ export default function AccountSettingsScreen() {
     ]);
   };
 
+  const providerValue = (linked: UserIdentities["google"]) =>
+    linked ? linked.displayName || t("account.bound") : t("account.unbound");
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.background }}
@@ -133,20 +156,24 @@ export default function AccountSettingsScreen() {
       >
         <SettingsGroup>
           <SettingsNavRow
-            title={t("account.phone")}
-            value={account.phone ? maskPhone(account.phone) : t("account.unbound")}
-            icon={Phone}
-            onPress={() => setEditingField("phone")}
+            title={t("account.google")}
+            value={providerValue(identities.google)}
+            iconNode={<GoogleProviderIcon />}
+            onPress={
+              identities.google || linkingProvider === "google"
+                ? undefined
+                : () => handleProviderBind("google")
+            }
           />
           <SettingsNavRow
-            title={t("account.wechat")}
-            value={
-              account.wechatBound
-                ? account.wechatNickname || t("account.bound")
-                : t("account.unbound")
+            title={t("account.github")}
+            value={providerValue(identities.github)}
+            iconNode={<GitHubProviderIcon />}
+            onPress={
+              identities.github || linkingProvider === "github"
+                ? undefined
+                : () => handleProviderBind("github")
             }
-            icon={MessageCircle}
-            onPress={handleWechatBind}
           />
           <SettingsNavRow
             title={t("account.email")}
@@ -167,15 +194,6 @@ export default function AccountSettingsScreen() {
           />
         </SettingsGroup>
 
-        <EditFieldModal
-          visible={editingField === "phone"}
-          title={t("account.changePhone")}
-          value={account.phone}
-          placeholder={t("account.phonePlaceholder")}
-          keyboardType="phone-pad"
-          onClose={() => setEditingField(null)}
-          onSave={(value) => handleFieldSave("phone", value)}
-        />
         <EditFieldModal
           visible={editingField === "email"}
           title={t("account.changeEmail")}

@@ -1,4 +1,4 @@
-import { CloudDownload, Info } from "lucide-react-native";
+import { CloudDownload, FileText, Info, Shield } from "lucide-react-native";
 import { router } from "expo-router";
 import { useRef } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -56,8 +56,22 @@ export default function AboutSettingsScreen() {
         <SettingsNavRow
           title={t("about.aboutApp")}
           icon={Info}
-          showDivider={false}
           onPress={() => router.push("/settings/about-app")}
+        />
+        <SettingsNavRow
+          title={t("about.terms")}
+          icon={FileText}
+          onPress={() =>
+            router.push({ pathname: "/settings/legal", params: { doc: "terms" } })
+          }
+        />
+        <SettingsNavRow
+          title={t("about.privacy")}
+          icon={Shield}
+          showDivider={false}
+          onPress={() =>
+            router.push({ pathname: "/settings/legal", params: { doc: "privacy" } })
+          }
         />
       </SettingsGroup>
 

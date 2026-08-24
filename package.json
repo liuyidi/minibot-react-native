@@ -1,7 +1,7 @@
 {
   "name": "minibot",
   "main": "./index.tsx",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "@minibot/client": "file:../minibot/packages/minibot-client",
+    "@mini-auth/auth-rn": "npm:@liuyidi/auth-rn@0.1.0",
+    "@minibot/client": "npm:@liuyidi/minibot-client@1.0.16",
     "@minibot/ui": "file:./packages/ui",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.2.0",

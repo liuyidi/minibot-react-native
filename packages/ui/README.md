@@ -9,6 +9,9 @@ Web analog: `@minikb/ui` in `minikb/packages/ui`.
 - **Create-first, replace-later** — new screens import from here; do not mass-migrate `src/components` yet.
 - No Expo Router, Gateway, or auth dependencies.
 - Colors come from a `palette` prop (or a future ThemeProvider), not hardcoded brand hex in components.
+- **Chat (planned):** mirror `@minikb/chat` prop contracts and `ChatAttachment` types from
+  `minikb/packages/chat/types`. Web implementation lives in `@minikb/chat`; RN primitives will
+  land here as `AttachmentCard`, `ChatSender`, etc.
 
 ## Usage
 

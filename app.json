@@ -2,7 +2,7 @@
   "expo": {
     "name": "Minibot",
     "slug": "minibot",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "minibot",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.liuyidi.minibot",
-      "buildNumber": "6",
+      "buildNumber": "7",
       "infoPlist": {
         "CFBundleDisplayName": "Minibot",
         "ITSAppUsesNonExemptEncryption": false
@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "com.liuyidi.minibot",
-      "versionCode": 6,
+      "versionCode": 7,
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -51,7 +51,12 @@
       "chatApiBaseUrl": "https://auth.liuyidi.me",
       "authApiBaseUrl": "https://auth.liuyidi.me",
       "minibotBaseUrl": "https://bot.liuyidi.me",
-      "minibotAuthSecret": ""
-    }
+      "minibotAuthSecret": "",
+      "router": {},
+      "eas": {
+        "projectId": "b5fd1beb-75bd-4bce-8bc6-78bd87ca03f4"
+      }
+    },
+    "owner": "liuyidi"
   }
 }

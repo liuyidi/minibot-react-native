@@ -29,9 +29,6 @@ export type MessageCatalog = {
   };
   appearance: {
     title: string;
-    sectionTheme: string;
-    sectionMode: string;
-    themeHint: string;
     modeHint: string;
     system: string;
     systemDesc: string;
@@ -39,6 +36,10 @@ export type MessageCatalog = {
     lightDesc: string;
     dark: string;
     darkDesc: string;
+  };
+  theme: {
+    title: string;
+    hint: string;
     packBrand: string;
     packBrandDesc: string;
     packCodex: string;
@@ -56,6 +57,7 @@ export type MessageCatalog = {
     sectionAccount: string;
     sectionAbout: string;
     server: string;
+    theme: string;
     appearance: string;
     language: string;
     account: string;
@@ -66,7 +68,8 @@ export type MessageCatalog = {
     defaultName: string;
     defaultBio: string;
     unbound: string;
-    wechatBound: string;
+    googleBound: string;
+    githubBound: string;
     statusIdle: string;
     statusConnecting: string;
     statusOpen: string;
@@ -76,6 +79,7 @@ export type MessageCatalog = {
   };
   settingsTitles: {
     profile: string;
+    theme: string;
     appearance: string;
     language: string;
     account: string;
@@ -225,6 +229,9 @@ export type MessageCatalog = {
     linksTitle: string;
     repoLink: string;
     githubLink: string;
+    terms: string;
+    privacy: string;
+    legalLoadFailed: string;
     versionLabel: string;
   };
   profile: {
@@ -242,26 +249,22 @@ export type MessageCatalog = {
     saveFailBody: string;
   };
   account: {
-    phone: string;
-    wechat: string;
+    google: string;
+    github: string;
     email: string;
     unbound: string;
     bound: string;
     notSet: string;
-    changePhone: string;
     changeEmail: string;
-    phonePlaceholder: string;
-    invalidPhoneTitle: string;
-    invalidPhoneBody: string;
     invalidEmailTitle: string;
     invalidEmailBody: string;
-    unbindWechatTitle: string;
-    unbindWechatBody: string;
-    unbind: string;
-    bindWechatTitle: string;
-    bindWechatBody: string;
+    bindGoogleTitle: string;
+    bindGoogleBody: string;
+    bindGithubTitle: string;
+    bindGithubBody: string;
     bind: string;
-    wechatUser: string;
+    bindFailedTitle: string;
+    bindFailedBody: string;
     deleteAccountTitle: string;
     deleteAccountBody: string;
     deleteConfirm: string;
@@ -297,9 +300,6 @@ export const zh: MessageCatalog = {
   },
   appearance: {
     title: "外观",
-    sectionTheme: "界面风格",
-    sectionMode: "深浅色",
-    themeHint: "选择产品视觉包。Codex 偏冷白/墨色；Claude 偏暖奶油/陶土。",
     modeHint: "系统模式将跟随 iOS / Android 的深浅色设置。",
     system: "系统",
     systemDesc: "跟随系统深浅色设置",
@@ -307,6 +307,10 @@ export const zh: MessageCatalog = {
     lightDesc: "始终使用浅色界面",
     dark: "深色",
     darkDesc: "始终使用深色界面",
+  },
+  theme: {
+    title: "主题",
+    hint: "选择产品视觉包。Codex 偏冷白/墨色；Claude 偏暖奶油/陶土。",
     packBrand: "Mini",
     packBrandDesc: "Mini Direction 02：白底 / 近黑字，黑主按钮",
     packCodex: "Codex",
@@ -324,6 +328,7 @@ export const zh: MessageCatalog = {
     sectionAccount: "账号与数据",
     sectionAbout: "关于",
     server: "Minibot 服务器",
+    theme: "主题",
     appearance: "外观",
     language: "语言",
     account: "账号",
@@ -334,7 +339,8 @@ export const zh: MessageCatalog = {
     defaultName: "Minibot 用户",
     defaultBio: "点按编辑个人资料",
     unbound: "未绑定",
-    wechatBound: "微信已绑定",
+    googleBound: "Google 已绑定",
+    githubBound: "GitHub 已绑定",
     statusIdle: "未连接",
     statusConnecting: "连接中",
     statusOpen: "已连接",
@@ -344,6 +350,7 @@ export const zh: MessageCatalog = {
   },
   settingsTitles: {
     profile: "个人信息",
+    theme: "主题",
     appearance: "外观",
     language: "语言",
     account: "账号管理",
@@ -494,6 +501,9 @@ export const zh: MessageCatalog = {
     linksTitle: "相关链接",
     repoLink: "Minibot 仓库 →",
     githubLink: "GitHub 开源仓库 →",
+    terms: "服务协议",
+    privacy: "隐私协议",
+    legalLoadFailed: "页面加载失败，请稍后重试。",
     versionLabel: "版本 {version}",
   },
   profile: {
@@ -511,26 +521,22 @@ export const zh: MessageCatalog = {
     saveFailBody: "请稍后重试。",
   },
   account: {
-    phone: "手机号",
-    wechat: "微信",
+    google: "Google",
+    github: "GitHub",
     email: "电子邮箱",
     unbound: "未绑定",
     bound: "已绑定",
     notSet: "未设置",
-    changePhone: "更改手机号",
     changeEmail: "更改邮箱",
-    phonePlaceholder: "请输入 11 位手机号",
-    invalidPhoneTitle: "格式有误",
-    invalidPhoneBody: "请输入 11 位中国大陆手机号。",
     invalidEmailTitle: "格式有误",
     invalidEmailBody: "请输入有效的邮箱地址。",
-    unbindWechatTitle: "解绑微信",
-    unbindWechatBody: "确定解除当前微信绑定？",
-    unbind: "解绑",
-    bindWechatTitle: "绑定微信",
-    bindWechatBody: "将跳转微信授权（演示：直接模拟绑定成功）",
+    bindGoogleTitle: "绑定 Google",
+    bindGoogleBody: "将跳转 Google 授权页面完成绑定。",
+    bindGithubTitle: "绑定 GitHub",
+    bindGithubBody: "将跳转 GitHub 授权页面完成绑定。",
     bind: "绑定",
-    wechatUser: "微信用户",
+    bindFailedTitle: "绑定失败",
+    bindFailedBody: "请稍后重试。",
     deleteAccountTitle: "注销账号",
     deleteAccountBody: "注销后将清除本机全部账号与聊天配置数据，此操作不可恢复。",
     deleteConfirm: "确认注销",
@@ -566,10 +572,6 @@ export const en: MessageCatalog = {
   },
   appearance: {
     title: "Appearance",
-    sectionTheme: "Theme pack",
-    sectionMode: "Color mode",
-    themeHint:
-      "Pick a visual pack. Codex is cool white/ink; Claude is warm cream/terracotta.",
     modeHint: "System mode follows your iOS / Android appearance setting.",
     system: "System",
     systemDesc: "Match system light / dark mode",
@@ -577,6 +579,10 @@ export const en: MessageCatalog = {
     lightDesc: "Always use light appearance",
     dark: "Dark",
     darkDesc: "Always use dark appearance",
+  },
+  theme: {
+    title: "Theme",
+    hint: "Pick a visual pack. Codex is cool white/ink; Claude is warm cream/terracotta.",
     packBrand: "Mini",
     packBrandDesc: "Mini Direction 02: white canvas / near-black ink, black primary",
     packCodex: "Codex",
@@ -594,6 +600,7 @@ export const en: MessageCatalog = {
     sectionAccount: "Account & data",
     sectionAbout: "About",
     server: "Minibot server",
+    theme: "Theme",
     appearance: "Appearance",
     language: "Language",
     account: "Account",
@@ -604,7 +611,8 @@ export const en: MessageCatalog = {
     defaultName: "Minibot user",
     defaultBio: "Tap to edit profile",
     unbound: "Not linked",
-    wechatBound: "WeChat linked",
+    googleBound: "Google linked",
+    githubBound: "GitHub linked",
     statusIdle: "Offline",
     statusConnecting: "Connecting",
     statusOpen: "Connected",
@@ -614,6 +622,7 @@ export const en: MessageCatalog = {
   },
   settingsTitles: {
     profile: "Profile",
+    theme: "Theme",
     appearance: "Appearance",
     language: "Language",
     account: "Account",
@@ -766,6 +775,9 @@ export const en: MessageCatalog = {
     linksTitle: "Links",
     repoLink: "Minibot repo →",
     githubLink: "GitHub open-source repo →",
+    terms: "Terms of Service",
+    privacy: "Privacy Policy",
+    legalLoadFailed: "Failed to load the page. Please try again later.",
     versionLabel: "Version {version}",
   },
   profile: {
@@ -783,26 +795,22 @@ export const en: MessageCatalog = {
     saveFailBody: "Please try again later.",
   },
   account: {
-    phone: "Phone",
-    wechat: "WeChat",
+    google: "Google",
+    github: "GitHub",
     email: "Email",
     unbound: "Not linked",
     bound: "Linked",
     notSet: "Not set",
-    changePhone: "Change phone number",
     changeEmail: "Change email",
-    phonePlaceholder: "11-digit mobile number",
-    invalidPhoneTitle: "Invalid format",
-    invalidPhoneBody: "Enter an 11-digit mainland China mobile number.",
     invalidEmailTitle: "Invalid format",
     invalidEmailBody: "Enter a valid email address.",
-    unbindWechatTitle: "Unlink WeChat",
-    unbindWechatBody: "Unlink your WeChat account?",
-    unbind: "Unlink",
-    bindWechatTitle: "Link WeChat",
-    bindWechatBody: "Opens WeChat authorization (demo: simulates success)",
+    bindGoogleTitle: "Link Google",
+    bindGoogleBody: "Opens Google authorization to link your account.",
+    bindGithubTitle: "Link GitHub",
+    bindGithubBody: "Opens GitHub authorization to link your account.",
     bind: "Link",
-    wechatUser: "WeChat user",
+    bindFailedTitle: "Link failed",
+    bindFailedBody: "Please try again later.",
     deleteAccountTitle: "Delete account",
     deleteAccountBody:
       "This clears all local account and chat data on this device. This cannot be undone.",

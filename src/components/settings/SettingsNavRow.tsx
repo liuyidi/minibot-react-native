@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react-native";
 import { ChevronRight } from "lucide-react-native";
+import type { ReactNode } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -10,6 +11,7 @@ type SettingsNavRowProps = {
   title: string;
   value?: string;
   icon?: LucideIcon;
+  iconNode?: ReactNode;
   showDivider?: boolean;
   destructive?: boolean;
   onPress?: () => void;
@@ -19,6 +21,7 @@ export function SettingsNavRow({
   title,
   value,
   icon,
+  iconNode,
   showDivider = true,
   destructive = false,
   onPress,
@@ -27,7 +30,9 @@ export function SettingsNavRow({
 
   const content = (
     <>
-      {icon ? (
+      {iconNode ? (
+        <View style={styles.customIcon}>{iconNode}</View>
+      ) : icon ? (
         <AppIcon
           icon={icon}
           size={20}
@@ -115,5 +120,11 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.72,
+  },
+  customIcon: {
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

@@ -4,6 +4,7 @@ import {
   Info,
   Languages,
   Palette,
+  SwatchBook,
 } from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -20,9 +21,11 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useMinibot } from "@/context/MinibotClientContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import {
+  fetchUserIdentities,
+  formatIdentityHubValue,
+} from "@/lib/auth/identities";
+import {
   maskEmail,
-  maskPhone,
-  type AccountInfo,
   getAccountInfo,
 } from "@/lib/settings/accountConfig";
 import { LANGUAGE_LABELS } from "@/lib/i18n/languageLabels";
@@ -39,12 +42,12 @@ export default function SettingsHubScreen() {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { t } = useLanguage();
-  const { mode: appearanceMode, setMode, themeDefinition } = useAppearance();
+  const { mode: appearanceMode, setMode, themeId } = useAppearance();
   const { language } = useLanguage();
-  const { user: authUser, logout } = useAuth();
+  const { user: authUser, logout, getAccessToken } = useAuth();
   const { status: minibotStatus, isConnected } = useMinibot();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [account, setAccount] = useState<AccountInfo | null>(null);
+  const [accountHubValue, setAccountHubValue] = useState(t("me.unbound"));
 
   const statusLabel = (status: string) => {
     switch (status) {
@@ -76,14 +79,56 @@ export default function SettingsHubScreen() {
     }
   };
 
+  const themeLabel = () => {
+    switch (themeId) {
+      case "brand":
+        return t("theme.packBrand");
+      case "claude":
+        return t("theme.packClaude");
+      default:
+        return t("theme.packCodex");
+    }
+  };
+
   const loadPreviewData = useCallback(async () => {
     const [nextProfile, nextAccount] = await Promise.all([
       getUserProfile(),
       getAccountInfo(),
     ]);
     setProfile(nextProfile);
-    setAccount(nextAccount);
-  }, []);
+
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      setAccountHubValue(
+        nextAccount.email
+          ? maskEmail(nextAccount.email)
+          : t("me.unbound")
+      );
+      return;
+    }
+
+    try {
+      const identities = await fetchUserIdentities(accessToken);
+      setAccountHubValue(
+        formatIdentityHubValue(
+          identities,
+          nextAccount.email,
+          {
+            googleBound: t("me.googleBound"),
+            githubBound: t("me.githubBound"),
+            unbound: t("me.unbound"),
+          },
+          maskEmail
+        )
+      );
+    } catch {
+      setAccountHubValue(
+        nextAccount.email
+          ? maskEmail(nextAccount.email)
+          : t("me.unbound")
+      );
+    }
+  }, [getAccessToken, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -114,14 +159,6 @@ export default function SettingsHubScreen() {
     profile?.bio ||
     authUser?.email ||
     t("me.defaultBio");
-
-  const accountHubValue = account?.phone
-    ? maskPhone(account.phone)
-    : account?.wechatBound
-      ? t("me.wechatBound")
-      : account?.email
-        ? maskEmail(account.email)
-        : t("me.unbound");
 
   const serverValue = isConnected
     ? t("me.statusOpen")
@@ -177,8 +214,14 @@ export default function SettingsHubScreen() {
       <View style={styles.sections}>
         <SettingsGroup title={t("me.sectionPrefs")}>
           <SettingsNavRow
+            title={t("me.theme")}
+            value={themeLabel()}
+            icon={SwatchBook}
+            onPress={() => router.push("/settings/theme")}
+          />
+          <SettingsNavRow
             title={t("me.appearance")}
-            value={`${themeDefinition.name} · ${appearanceLabel()}`}
+            value={appearanceLabel()}
             icon={Palette}
             onPress={() => router.push("/settings/appearance")}
           />

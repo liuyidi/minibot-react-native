@@ -48,8 +48,9 @@ resolve_java_home() {
 }
 
 export JAVA_HOME="$(resolve_java_home || true)"
-export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
-export PATH="${JAVA_HOME:+$JAVA_HOME/bin:}${ANDROID_HOME}/platform-tools:${PATH}"
+export ANDROID_HOME="${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}"
+export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+export PATH="${JAVA_HOME:+$JAVA_HOME/bin:}${ANDROID_HOME}/emulator:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
 
 if [[ -z "${JAVA_HOME:-}" ]]; then
   echo "JDK 17 not found. Install it, e.g.: brew install openjdk@17" >&2

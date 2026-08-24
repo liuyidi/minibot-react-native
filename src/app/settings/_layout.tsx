@@ -38,6 +38,7 @@ export default function SettingsLayout() {
       )}
     >
       <Stack.Screen name="profile" options={{ title: t("settingsTitles.profile") }} />
+      <Stack.Screen name="theme" options={{ title: t("settingsTitles.theme") }} />
       <Stack.Screen
         name="appearance"
         options={{ title: t("settingsTitles.appearance") }}
@@ -48,6 +49,7 @@ export default function SettingsLayout() {
       <Stack.Screen name="about" options={{ title: t("settingsTitles.about") }} />
 
       <Stack.Screen name="about-app" options={{ title: t("settingsTitles.aboutApp") }} />
+      <Stack.Screen name="legal" options={{ title: t("about.terms") }} />
     </Stack>
   );
 }

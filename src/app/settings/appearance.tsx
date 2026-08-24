@@ -8,14 +8,12 @@ import { useAppearance } from "@/context/AppearanceContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import type { AppearanceMode } from "@/lib/settings/appearanceConfig";
-import { THEME_IDS, getThemeDefinition } from "@/lib/theme/registry";
-import type { ThemeId } from "@/lib/theme/types";
 
 export default function AppearanceSettingsScreen() {
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const { t } = useLanguage();
-  const { mode, setMode, themeId, setThemeId } = useAppearance();
+  const { mode, setMode } = useAppearance();
 
   const modeOptions: {
     value: AppearanceMode;
@@ -43,17 +41,6 @@ export default function AppearanceSettingsScreen() {
     },
   ];
 
-  const packDesc = (id: ThemeId) => {
-    if (id === "brand") return t("appearance.packBrandDesc");
-    if (id === "claude") return t("appearance.packClaudeDesc");
-    return t("appearance.packCodexDesc");
-  };
-  const packName = (id: ThemeId) => {
-    if (id === "brand") return t("appearance.packBrand");
-    if (id === "claude") return t("appearance.packClaude");
-    return t("appearance.packCodex");
-  };
-
   return (
     <ScrollView
       style={[styles.screen, { backgroundColor: theme.background }]}
@@ -63,58 +50,6 @@ export default function AppearanceSettingsScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      <ThemedText type="secondary" style={styles.sectionLabel}>
-        {t("appearance.sectionTheme")}
-      </ThemedText>
-      <ThemedText type="secondary" style={styles.hint}>
-        {t("appearance.themeHint")}
-      </ThemedText>
-
-      <View style={styles.themeGrid}>
-        {THEME_IDS.map((id) => {
-          const def = getThemeDefinition(id);
-          const selected = themeId === id;
-          return (
-            <Pressable
-              key={id}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              onPress={() => void setThemeId(id as ThemeId)}
-              style={({ pressed }) => [
-                styles.themeCard,
-                {
-                  backgroundColor: theme.card,
-                  borderColor: selected ? theme.primary : theme.border,
-                  borderWidth: selected ? 2 : StyleSheet.hairlineWidth,
-                },
-                pressed && styles.pressed,
-              ]}
-            >
-              <View style={styles.swatchRow}>
-                {def.swatches.map((color) => (
-                  <View
-                    key={color}
-                    style={[styles.swatch, { backgroundColor: color }]}
-                  />
-                ))}
-              </View>
-              <View style={styles.themeMeta}>
-                <ThemedText type="defaultSemiBold">{packName(id)}</ThemedText>
-                {selected ? (
-                  <AppIcon icon={CircleCheck} size={18} color={theme.primary} />
-                ) : null}
-              </View>
-              <ThemedText type="secondary" style={styles.themeDesc} numberOfLines={2}>
-                {packDesc(id)}
-              </ThemedText>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <ThemedText type="secondary" style={[styles.sectionLabel, styles.sectionGap]}>
-        {t("appearance.sectionMode")}
-      </ThemedText>
       <ThemedText type="secondary" style={styles.hint}>
         {t("appearance.modeHint")}
       </ThemedText>
@@ -182,24 +117,7 @@ export default function AppearanceSettingsScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 20, gap: 10 },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
-  },
-  sectionGap: { marginTop: 16 },
   hint: { lineHeight: 22, marginBottom: 4 },
-  themeGrid: { gap: 10 },
-  themeCard: { borderRadius: 16, padding: 14, gap: 8 },
-  swatchRow: { flexDirection: "row", gap: 8 },
-  swatch: { width: 28, height: 28, borderRadius: 8 },
-  themeMeta: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  themeDesc: { fontSize: 13, lineHeight: 18 },
   card: { borderRadius: 18, borderWidth: 1, overflow: "hidden" },
   optionRow: {
     flexDirection: "row",
