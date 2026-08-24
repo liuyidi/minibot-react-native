@@ -35,6 +35,7 @@
 - **主题与偏好**：外观主题包、明暗模式、语言
 - **账号**：mini-auth 邮箱验证码 / Demo / OAuth；Gateway Bearer
 - **路线图**：会话体验与设置面对齐 webui —— 见 [docs/TODO.md](./docs/TODO.md)
+- **内测安装**（iOS 开发者模式 / Ad Hoc、Android APK）：[docs/internal-distribution-testers.md](./docs/internal-distribution-testers.md)
 
 ## 技术栈
 

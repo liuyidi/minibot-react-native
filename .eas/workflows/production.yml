@@ -1,0 +1,22 @@
+name: Production (store)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build_android:
+    name: Android AAB
+    type: build
+    environment: production
+    params:
+      platform: android
+      profile: production
+      message: EAS Workflow production Android
+  build_ios:
+    name: iOS App Store
+    type: build
+    environment: production
+    params:
+      platform: ios
+      profile: production
+      message: EAS Workflow production iOS

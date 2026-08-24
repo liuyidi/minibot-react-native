@@ -16,6 +16,7 @@
 | [superpowers/plans/2026-08-21-deferred-login-layout-polish.md](./superpowers/plans/2026-08-21-deferred-login-layout-polish.md) | **延后**：登录页 Android/iOS 布局微调 | 待办，不挡 Chat MVP |
 | [minibot-mobile-roadmap.md](./minibot-mobile-roadmap.md) | 主路线图：差距分析、Phase 0–4 | 参考（部分已被 rebuild spec 取代） |
 | [app-release-china.md](./app-release-china.md) | 国内 iOS / Android 上架与合规 | 后期 |
+| [internal-distribution-testers.md](./internal-distribution-testers.md) | **内测安装**：iOS 开发者模式 / Ad Hoc、Android APK、EAS 链接 | 现行 |
 
 ---
 
@@ -38,7 +39,7 @@
 | 本地存储 | auth token → SecureStore；minibot URL → AsyncStorage；离线会话草稿 → AsyncStorage |
 | 账号 | mini-auth：邮箱验证码 / Demo / Google·GitHub（AuthSession）；Gateway Bearer |
 | 图标 | lucide-react-native（Phase 0 完成） |
-| 发布 | Expo SDK 54，`bundleIdentifier: com.liuyidi.minibot`；已有 `eas.json` |
+| 发布 | Expo SDK 54，`com.liuyidi.minibot`；EAS preview 已出 Android APK / iOS Ad Hoc；见 [内测安装说明](./internal-distribution-testers.md) |
 
 ---
 

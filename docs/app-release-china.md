@@ -1,7 +1,7 @@
 # App 国内发布部署
 
 > 规划说明，不含实现代码。  
-> 更新时间：2026-07-05
+> 更新时间：2026-08-24
 
 ---
 
@@ -11,7 +11,7 @@
 |------|----------|
 | 技术栈 | Expo SDK 54，Managed Workflow |
 | 包名 | `com.liuyidi.minibot`（iOS / Android） |
-| 构建 | 未配置 EAS |
+| 构建 | EAS 已配置（`eas.json`：development / preview / production）；preview 已出 Android APK 与 iOS Ad Hoc IPA |
 
 ---
 
@@ -57,6 +57,8 @@
 | 审核 | 7–14 天常见；需说明 App 用途、是否调用 AI 接口、数据如何处理 |
 
 **TestFlight**：审核前可用 TestFlight 内测（需 Apple Developer）。
+
+**给测试同学的安装说明**（Ad Hoc / 开发者模式 / APK）：[internal-distribution-testers.md](./internal-distribution-testers.md)。
 
 ---
 
@@ -130,5 +132,6 @@ Phase 3  全渠道   补齐 OPPO/vivo/应用宝 + 版本迭代自动化（EAS Up
 
 ## 相关文档
 
+- [内测安装说明（测试同学）](./internal-distribution-testers.md)
 - [总览与依赖关系](./TODO.md)
 - [后端接入（账号与合规）](./backend-fastapi-railway.md)

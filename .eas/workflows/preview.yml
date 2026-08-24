@@ -1,0 +1,24 @@
+name: Preview (internal test)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build_android:
+    name: Android APK
+    type: build
+    environment: preview
+    params:
+      platform: android
+      profile: preview
+      message: EAS Workflow preview Android
+  build_ios:
+    name: iOS Ad Hoc
+    type: build
+    environment: preview
+    params:
+      platform: ios
+      profile: preview
+      message: EAS Workflow preview iOS
+      # Do not set refresh_ad_hoc_provisioning_profile until an App Store Connect
+      # API Key is configured (EXPO_ASC_* or EAS submissions credentials).
