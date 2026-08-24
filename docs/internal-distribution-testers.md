@@ -86,6 +86,21 @@ env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy -u ALL_PROXY -u al
   npx eas build --platform android --profile preview --non-interactive --no-wait
 ```
 
+公开下载页 Android APK（OSS，非商店 AAB）：
+
+```bash
+env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy -u ALL_PROXY -u all_proxy \
+  npx eas build --platform android --profile production-apk --non-interactive --no-wait
+```
+
+打完后把 APK 同步到 OSS（下载页读 `releases.json`，不必重发 WebUI）：
+
+```bash
+cd ~/github/minibot
+source scripts/oss-release.env
+scripts/publish-oss-releases.sh --version 1.0.7 --android /path/to/minibot.apk
+```
+
 EAS 项目需配置 Secret `NODE_AUTH_TOKEN`（GitHub Packages），环境勾选 development / preview / production。
 
 ### EAS Workflows（云端）

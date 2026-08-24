@@ -4,6 +4,14 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  build_android_apk:
+    name: Android APK (download page)
+    type: build
+    environment: production
+    params:
+      platform: android
+      profile: production-apk
+      message: EAS Workflow production Android APK
   build_android:
     name: Android AAB
     type: build
@@ -11,7 +19,7 @@ jobs:
     params:
       platform: android
       profile: production
-      message: EAS Workflow production Android
+      message: EAS Workflow production Android AAB
   build_ios:
     name: iOS App Store
     type: build
