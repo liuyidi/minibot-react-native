@@ -125,7 +125,7 @@ npx eas submit --platform ios --profile production --id <EAS_BUILD_UUID> --non-i
 ## 六、挂到 minibot 下载页
 
 清单：`https://downloads.liuyidi.me/minibot/releases.json`  
-页面：`https://bot.liuyidi.me/#/download/`
+页面：`https://liuyidi.me/minibot/download/`
 
 拿到 join 链接后，在 OSS 的 `releases.json` 写入（保留其它平台字段）：
 
