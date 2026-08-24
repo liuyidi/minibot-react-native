@@ -416,7 +416,7 @@ export function MiniLoginScreen({
         contentContainerStyle={[
           styles.scroll,
           {
-            paddingTop: insets.top + 44,
+            paddingTop: insets.top + 72,
             paddingBottom: Math.max(insets.bottom, 12) + 8,
           },
         ]}
