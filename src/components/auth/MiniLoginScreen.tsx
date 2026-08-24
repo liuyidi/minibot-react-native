@@ -176,7 +176,7 @@ function normalizeEmail(value: string): string {
 
 function GoogleIcon() {
   return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" accessibilityElementsHidden>
+    <Svg width={20} height={20} viewBox="0 0 24 24" accessibilityElementsHidden>
       <Path
         fill="#4285f4"
         d="M22.6 12.2c0-.7-.1-1.3-.2-1.9H12v3.7h6c-.3 1.4-1 2.5-2.1 3.2v2.7h3.4c2-1.8 3.3-4.5 3.3-7.7Z"
@@ -199,7 +199,7 @@ function GoogleIcon() {
 
 function GitHubIcon() {
   return (
-    <Svg width={24} height={24} viewBox="0 0 24 24" accessibilityElementsHidden>
+    <Svg width={20} height={20} viewBox="0 0 24 24" accessibilityElementsHidden>
       <Path
         fill={colors.ink}
         d="M12 1.8a10.3 10.3 0 0 0-3.3 20c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 2.9.8.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.8-.1-.3-.5-1.3.1-2.8 0 0 .9-.3 2.8 1a9.7 9.7 0 0 1 5.1 0c2-1.3 2.8-1 2.8-1 .6 1.5.2 2.5.1 2.8.7.8 1 1.7 1 2.8 0 3.9-2.4 4.7-4.6 5 .4.3.8 1 .8 2v2.9c0 .3.2.6.8.5A10.3 10.3 0 0 0 12 1.8Z"
@@ -416,8 +416,8 @@ export function MiniLoginScreen({
         contentContainerStyle={[
           styles.scroll,
           {
-            paddingTop: insets.top + 88,
-            paddingBottom: Math.max(insets.bottom, 16) + 24,
+            paddingTop: insets.top + 44,
+            paddingBottom: Math.max(insets.bottom, 12) + 8,
           },
         ]}
       >
@@ -460,6 +460,7 @@ export function MiniLoginScreen({
               <TextField
                 label={copy.username}
                 palette={fieldPalette}
+                containerStyle={styles.field}
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
@@ -472,6 +473,7 @@ export function MiniLoginScreen({
             <TextField
               label={copy.email}
               palette={fieldPalette}
+              containerStyle={styles.field}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -487,6 +489,7 @@ export function MiniLoginScreen({
               <TextField
                 hint={copy.codeSentTo(sentEmail)}
                 palette={fieldPalette}
+                containerStyle={styles.field}
                 value={code}
                 onChangeText={setCode}
                 keyboardType="number-pad"
@@ -631,12 +634,14 @@ const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
   },
   panel: {
     width: "100%",
     maxWidth: 400,
     flexGrow: 1,
+    justifyContent: "space-between",
     alignItems: "center",
   },
   main: {
@@ -645,27 +650,27 @@ const styles = StyleSheet.create({
   },
   brand: {
     color: colors.ink,
-    fontSize: 40,
+    fontSize: 36,
     fontWeight: "800",
-    lineHeight: 48,
+    lineHeight: 40,
   },
   headline: {
-    marginTop: 42,
-    marginBottom: 28,
+    marginTop: 8,
+    marginBottom: 14,
     color: colors.ink,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "500",
-    lineHeight: 28,
+    lineHeight: 22,
     textAlign: "center",
   },
   providers: {
     width: "100%",
-    gap: 18,
+    gap: 10,
   },
   provider: {
     position: "relative",
     overflow: "hidden",
-    minHeight: 48,
+    minHeight: 44,
     borderRadius: 10,
     backgroundColor: colors.surface,
     alignItems: "center",
@@ -681,25 +686,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
-    paddingHorizontal: 18,
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
   providerLabel: {
     color: colors.ink,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 20,
   },
   divider: {
-    marginVertical: 32,
+    marginVertical: 12,
     color: colors.muted,
-    fontSize: 18,
+    fontSize: 15,
     lineHeight: 18,
   },
   errorBox: {
     width: "100%",
-    marginBottom: 18,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    marginBottom: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 10,
     backgroundColor: colors.dangerSurface,
   },
@@ -711,19 +717,22 @@ const styles = StyleSheet.create({
   },
   form: {
     width: "100%",
-    gap: 18,
+    gap: 12,
+  },
+  field: {
+    gap: 6,
   },
   continueBtn: {
     borderWidth: 0,
   },
   support: {
     width: "100%",
-    marginTop: 30,
+    marginTop: 16,
   },
   supportText: {
     color: colors.support,
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 20,
     textAlign: "center",
   },
   supportLink: {
@@ -746,22 +755,22 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: "auto",
-    paddingTop: 48,
+    paddingTop: 16,
     alignItems: "center",
   },
   footerPowered: {
     color: colors.subtle,
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 13,
+    lineHeight: 18,
   },
   footerBrand: {
     color: colors.ink,
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 14,
+    lineHeight: 18,
     fontWeight: "700",
   },
   footerLegalRow: {
-    marginTop: 14,
+    marginTop: 6,
     flexDirection: "row",
     alignItems: "center",
   },
