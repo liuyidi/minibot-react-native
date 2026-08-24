@@ -1,35 +1,35 @@
-import { useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
-import { useLayoutEffect, useMemo, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useMemo, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 
-import { ThemedText } from "@/components/ThemedText";
-import { useT } from "@/context/LanguageContext";
-import { useAppTheme } from "@/hooks/useAppTheme";
+import { useLanguage } from "@/context/LanguageContext";
 import { LEGAL_DOCS, resolveLegalDoc } from "@/lib/legal/docs";
 
-export default function LegalDocumentScreen() {
-  const theme = useAppTheme();
-  const t = useT();
-  const navigation = useNavigation();
+export default function AuthLegalScreen() {
+  const { language } = useLanguage();
   const { doc: docParam } = useLocalSearchParams<{ doc?: string }>();
   const doc = resolveLegalDoc(docParam);
   const config = LEGAL_DOCS[doc];
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
-  const title = useMemo(() => t(config.titleKey), [config.titleKey, t]);
+  const title = useMemo(() => {
+    if (doc === "privacy") {
+      return language === "zh" ? "隐私政策" : "Privacy Policy";
+    }
+    return language === "zh" ? "服务条款" : "Terms of Service";
+  }, [doc, language]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({ title });
-  }, [navigation, title]);
+  const failedText =
+    language === "zh" ? "页面加载失败，请稍后重试。" : "Failed to load the page.";
 
   return (
-    <View style={[styles.screen, { backgroundColor: theme.background }]}>
+    <View style={styles.screen}>
+      <Stack.Screen options={{ title, headerShown: true }} />
       {failed ? (
         <View style={styles.fallback}>
-          <ThemedText type="secondary">{t("about.legalLoadFailed")}</ThemedText>
+          <Text style={styles.fallbackText}>{failedText}</Text>
         </View>
       ) : (
         <WebView
@@ -46,18 +46,15 @@ export default function LegalDocumentScreen() {
           }}
           startInLoadingState
           renderLoading={() => (
-            <View style={[styles.loading, { backgroundColor: theme.background }]}>
-              <ActivityIndicator size="large" color={theme.text} />
+            <View style={styles.loading}>
+              <ActivityIndicator size="large" color="#080808" />
             </View>
           )}
         />
       )}
       {loading && !failed ? (
-        <View
-          pointerEvents="none"
-          style={[styles.loadingOverlay, { backgroundColor: theme.background }]}
-        >
-          <ActivityIndicator size="large" color={theme.text} />
+        <View pointerEvents="none" style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#080808" />
         </View>
       ) : null}
     </View>
@@ -67,6 +64,7 @@ export default function LegalDocumentScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: "#ffffff",
   },
   webview: {
     flex: 1,
@@ -76,16 +74,23 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#ffffff",
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#ffffff",
   },
   fallback: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
+  },
+  fallbackText: {
+    color: "#666666",
+    fontSize: 15,
+    textAlign: "center",
   },
 });

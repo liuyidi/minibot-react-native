@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   KeyboardAvoidingView,
@@ -415,12 +416,13 @@ export function MiniLoginScreen({
         contentContainerStyle={[
           styles.scroll,
           {
-            paddingTop: Math.max(insets.top + 40, 56),
-            paddingBottom: insets.bottom + 40,
+            paddingTop: insets.top + 88,
+            paddingBottom: Math.max(insets.bottom, 16) + 24,
           },
         ]}
       >
         <View style={styles.panel}>
+          <View style={styles.main}>
           <Text style={styles.brand}>{brand}</Text>
           <Text style={styles.headline} accessibilityRole="header">
             {isRegister ? copy.headlineRegister : copy.headlineLogin}
@@ -558,16 +560,40 @@ export function MiniLoginScreen({
               <Text style={styles.debugText}>{copy.debugCode(debugCode)}</Text>
             </View>
           ) : null}
+          </View>
 
           <View style={styles.footer}>
             <Text style={styles.footerPowered}>
-              {copy.poweredBy} <Text style={styles.footerBrand}>{brand}</Text>
+              {copy.poweredBy}{" "}
+              <Text style={styles.footerBrand}>{brand}</Text>
             </Text>
-            <Text style={styles.footerLegal}>
-              {copy.privacy}
-              {" · "}
-              {copy.terms}
-            </Text>
+            <View style={styles.footerLegalRow}>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() =>
+                  router.push({
+                    pathname: "/(auth)/legal",
+                    params: { doc: "privacy" },
+                  })
+                }
+                hitSlop={8}
+              >
+                <Text style={styles.footerLegal}>{copy.privacy}</Text>
+              </Pressable>
+              <Text style={styles.footerLegalSep}> · </Text>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() =>
+                  router.push({
+                    pathname: "/(auth)/legal",
+                    params: { doc: "terms" },
+                  })
+                }
+                hitSlop={8}
+              >
+                <Text style={styles.footerLegal}>{copy.terms}</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -610,13 +636,18 @@ const styles = StyleSheet.create({
   panel: {
     width: "100%",
     maxWidth: 400,
+    flexGrow: 1,
+    alignItems: "center",
+  },
+  main: {
+    width: "100%",
     alignItems: "center",
   },
   brand: {
     color: colors.ink,
     fontSize: 40,
     fontWeight: "800",
-    lineHeight: 40,
+    lineHeight: 48,
   },
   headline: {
     marginTop: 42,
@@ -697,7 +728,7 @@ const styles = StyleSheet.create({
   },
   supportLink: {
     color: colors.ink,
-    textDecorationLine: "underline",
+    fontWeight: "500",
   },
   supportDisabled: {
     opacity: 0.48,
@@ -714,23 +745,35 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   footer: {
-    marginTop: 52,
+    marginTop: "auto",
+    paddingTop: 48,
     alignItems: "center",
   },
   footerPowered: {
     color: colors.subtle,
     fontSize: 16,
-    lineHeight: 16,
+    lineHeight: 28,
   },
   footerBrand: {
     color: colors.ink,
     fontSize: 20,
+    lineHeight: 28,
     fontWeight: "700",
   },
-  footerLegal: {
+  footerLegalRow: {
     marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  footerLegal: {
     color: colors.muted,
     fontSize: 14,
+    lineHeight: 20,
     textDecorationLine: "underline",
+  },
+  footerLegalSep: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
