@@ -52,7 +52,7 @@ Ad Hoc 内测包 **只能装在已登记 UDID 的设备**上。未登记手机�
 - 系统升级后可能要重新开开发者模式
 - 确认这台 iPhone 已加入本次 Ad Hoc 设备列表（当前登记示例：`00008110-000E1DA43431401E`）
 
-App Store / TestFlight 包一般 **不需要** 开发者模式。正式上架后测试同学改走 TestFlight 即可。
+App Store / TestFlight 包一般 **不需要** 开发者模式。公开链接落地：[testflight-public-link.md](./testflight-public-link.md)。
 
 ---
 

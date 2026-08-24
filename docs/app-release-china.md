@@ -56,7 +56,7 @@
 | 构建上传 | EAS Submit → App Store Connect，或 Transporter 上传 IPA |
 | 审核 | 7–14 天常见；需说明 App 用途、是否调用 AI 接口、数据如何处理 |
 
-**TestFlight**：审核前可用 TestFlight 内测（需 Apple Developer）。
+**TestFlight 公开链接**（下载页扫码、无需 UDID）：完整步骤见 [testflight-public-link.md](./testflight-public-link.md)。
 
 **给测试同学的安装说明**（Ad Hoc / 开发者模式 / APK）：[internal-distribution-testers.md](./internal-distribution-testers.md)。
 
@@ -133,5 +133,6 @@ Phase 3  全渠道   补齐 OPPO/vivo/应用宝 + 版本迭代自动化（EAS Up
 ## 相关文档
 
 - [内测安装说明（测试同学）](./internal-distribution-testers.md)
+- [TestFlight 公开链接](./testflight-public-link.md)
 - [总览与依赖关系](./TODO.md)
 - [后端接入（账号与合规）](./backend-fastapi-railway.md)
