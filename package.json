@@ -12,6 +12,8 @@
     "version:bump": "node scripts/bump-version.js",
     "build:android:prebuild": "expo prebuild --platform android --no-install",
     "build:android:apk": "bash scripts/build-android-apk.sh",
+    "eas:workflow:preview": "env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy -u ALL_PROXY -u all_proxy npx eas workflow:run preview.yml",
+    "eas:workflow:production": "env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy -u ALL_PROXY -u all_proxy npx eas workflow:run production.yml",
     "install:deps": "bash scripts/npm-with-github-auth.sh install",
     "setup:github-packages": "bash scripts/setup-github-packages.sh",
     "sync:tokens": "node scripts/sync-design-tokens.mjs"

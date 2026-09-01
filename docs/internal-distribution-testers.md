@@ -113,12 +113,11 @@ EAS 项目需配置 Secret `NODE_AUTH_TOKEN`（GitHub Packages），环境勾选
 | `production.yml` | 商店：Android AAB + iOS App Store IPA | 控制台手动 / `eas workflow:run` |
 
 ```bash
-env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy -u ALL_PROXY -u all_proxy \
-  npx eas workflow:run preview.yml
-
-env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy -u ALL_PROXY -u all_proxy \
-  npx eas workflow:run production.yml
+npm run eas:workflow:preview      # .eas/workflows/preview.yml
+npm run eas:workflow:production   # .eas/workflows/production.yml
 ```
+
+（脚本会卸掉本机代理后再跑 `eas workflow:run`，避免 `api.expo.dev` TLS 失败。）
 
 打完后把新构建 URL 替换本文「一键入口」表格。
 
