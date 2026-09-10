@@ -34,7 +34,8 @@ export default function TabLayout() {
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarLabelStyle: styles.tabLabel,
         headerShown: false,
-        tabBarButton: HapticTab,
+        // RN 0.86 / React 19 Pressable children typing is stricter than PlatformPressable.
+        tabBarButton: HapticTab as never,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {

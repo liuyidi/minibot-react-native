@@ -3,7 +3,6 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,10 +11,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/ThemedText";
+import { AppIcon } from "@/components/ui/AppIcon";
 import { useAuth } from "@/context/AuthContext";
 import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { resolveDeviceArtwork } from "@/lib/auth/deviceArtwork";
+import { markDevicesListDirty } from "@/lib/auth/devicesListDirty";
 import {
   fetchSecuritySnapshot,
   maskIpForDisplay,
@@ -86,6 +87,7 @@ export default function DeviceDetailScreen() {
                 throw new Error(t("devices.revokeFailed"));
               }
               await revokeSecuritySession(token, device.id);
+              markDevicesListDirty();
               router.back();
             } catch (err) {
               const message =
@@ -120,11 +122,18 @@ export default function DeviceDetailScreen() {
           { paddingBottom: device.isCurrent ? Math.max(insets.bottom, 24) : 120 },
         ]}
       >
-        <Image
-          source={resolveDeviceArtwork(device)}
-          style={styles.hero}
-          accessibilityIgnoresInvertColors
-        />
+        <View
+          style={[
+            styles.hero,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <AppIcon
+            icon={resolveDeviceArtwork(device)}
+            size={56}
+            color={theme.text}
+          />
+        </View>
         <ThemedText type="defaultSemiBold" style={styles.title}>
           {device.name}
         </ThemedText>
@@ -238,10 +247,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   hero: {
-    width: 120,
-    height: 120,
-    borderRadius: 16,
+    width: 96,
+    height: 96,
+    borderRadius: 24,
+    borderWidth: StyleSheet.hairlineWidth,
     marginBottom: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 22,

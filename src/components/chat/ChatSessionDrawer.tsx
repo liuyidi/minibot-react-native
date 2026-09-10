@@ -543,7 +543,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   panelLayer: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     zIndex: 1,
   },
   panel: {
@@ -561,7 +565,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   chatLayer: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     zIndex: 2,
     overflow: "hidden",
   },
@@ -577,7 +585,11 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   dimOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     backgroundColor: "#000000",
     zIndex: 20,
   },

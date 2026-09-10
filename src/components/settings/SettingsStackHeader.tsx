@@ -1,4 +1,4 @@
-import type { NativeStackHeaderProps } from "@react-navigation/native-stack";
+import type { NativeStackHeaderProps } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

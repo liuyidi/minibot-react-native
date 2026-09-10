@@ -1,9 +1,8 @@
 import { ChevronRight } from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -18,36 +17,58 @@ import { useAuth } from "@/context/AuthContext";
 import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { resolveDeviceArtwork } from "@/lib/auth/deviceArtwork";
+import { consumeDevicesListDirty } from "@/lib/auth/devicesListDirty";
 import {
   fetchSecuritySnapshot,
+  maskIpForDisplay,
   type SecurityDevice,
 } from "@/lib/auth/security";
+
+function deviceSubtitle(device: SecurityDevice): string {
+  const masked = maskIpForDisplay(device.ipAddress);
+  const location = (device.location || "").trim();
+  if (location && masked && location !== masked && location !== device.ipAddress) {
+    return `${location} (${masked})`;
+  }
+  if (location) {
+    return location;
+  }
+  return masked || "";
+}
 
 export default function DevicesListScreen() {
   const t = useT();
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
-  const { getAccessToken } = useAuth();
+  const { getAccessToken, syncSessionMeta } = useAuth();
   const [devices, setDevices] = useState<SecurityDevice[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const didSyncMetaRef = useRef(false);
+  const hasLoadedRef = useRef(false);
 
   const load = useCallback(
-    async (mode: "initial" | "refresh" = "initial") => {
+    async (mode: "initial" | "refresh" | "silent" = "initial") => {
       if (mode === "refresh") {
         setRefreshing(true);
-      } else {
+      } else if (mode === "initial") {
         setLoading(true);
       }
       setError(null);
       try {
+        // One-shot backfill of device label / IP — must not run on every focus reload.
+        if (!didSyncMetaRef.current) {
+          didSyncMetaRef.current = true;
+          await syncSessionMeta();
+        }
         const token = await getAccessToken();
         if (!token) {
           throw new Error(t("devices.loadFailed"));
         }
         const snapshot = await fetchSecuritySnapshot(token);
         setDevices(snapshot.devices);
+        hasLoadedRef.current = true;
       } catch (err) {
         setError(err instanceof Error ? err.message : t("devices.loadFailed"));
         setDevices([]);
@@ -56,12 +77,20 @@ export default function DevicesListScreen() {
         setRefreshing(false);
       }
     },
-    [getAccessToken, t]
+    [getAccessToken, syncSessionMeta, t]
   );
 
+  useEffect(() => {
+    void load("initial");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional first mount only
+  }, []);
+
+  // After revoke (or other dirty ops), refresh quietly — normal back from detail does nothing.
   useFocusEffect(
     useCallback(() => {
-      void load("initial");
+      if (hasLoadedRef.current && consumeDevicesListDirty()) {
+        void load("silent");
+      }
     }, [load])
   );
 
@@ -147,11 +176,18 @@ export default function DevicesListScreen() {
                 pressed && styles.pressed,
               ]}
             >
-              <Image
-                source={resolveDeviceArtwork(device)}
-                style={styles.icon}
-                accessibilityIgnoresInvertColors
-              />
+              <View
+                style={[
+                  styles.iconWrap,
+                  { backgroundColor: theme.background, borderColor: theme.border },
+                ]}
+              >
+                <AppIcon
+                  icon={resolveDeviceArtwork(device)}
+                  size={22}
+                  color={theme.text}
+                />
+              </View>
               <View style={styles.rowBody}>
                 <View style={styles.nameRow}>
                   <ThemedText type="defaultSemiBold" numberOfLines={1} style={styles.name}>
@@ -170,9 +206,9 @@ export default function DevicesListScreen() {
                     </View>
                   ) : null}
                 </View>
-                {device.location ? (
+                {deviceSubtitle(device) ? (
                   <ThemedText type="secondary" numberOfLines={1} style={styles.subtitle}>
-                    {device.location}
+                    {deviceSubtitle(device)}
                   </ThemedText>
                 ) : null}
               </View>
@@ -223,10 +259,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     minHeight: 64,
   },
-  icon: {
+  iconWrap: {
     width: 40,
     height: 40,
-    borderRadius: 8,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: "center",
+    justifyContent: "center",
   },
   rowBody: {
     flex: 1,

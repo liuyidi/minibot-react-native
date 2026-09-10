@@ -1,11 +1,13 @@
 import { createAuthClient } from "@mini-auth/auth-rn";
 import type { AuthResponse } from "@mini-auth/auth-rn";
 
+import { authDeviceHeaders } from "@/lib/auth/deviceLabel";
 import { getAuthApiBaseUrl } from "@/lib/chat/apiConfig";
 
 /** Singleton IdP client — base URL from app.json / getAuthApiBaseUrl(). */
 export const authClient = createAuthClient({
   baseUrl: getAuthApiBaseUrl(),
+  defaultHeaders: authDeviceHeaders(),
 });
 
 const DEMO_EMAIL = "demo@mini-auth.dev";
@@ -25,7 +27,10 @@ function authBase(): string {
 async function postJson<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${authBase()}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...authDeviceHeaders(),
+    },
     body: JSON.stringify(body),
   });
   const data = (await response.json().catch(() => ({}))) as T & { detail?: string };

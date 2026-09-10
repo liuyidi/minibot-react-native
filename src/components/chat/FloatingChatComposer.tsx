@@ -1,4 +1,4 @@
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight } from "expo-router/js-tabs";
 import { ArrowUp, Square } from "lucide-react-native";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { useCallback, useEffect, useState } from "react";

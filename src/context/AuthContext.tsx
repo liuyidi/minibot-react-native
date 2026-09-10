@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -51,6 +52,8 @@ type AuthContextValue = {
   logout: () => Promise<void>;
   enterGuestMode: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
+  /** Refresh tokens and push local device label / IP onto the current session. */
+  syncSessionMeta: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -84,6 +87,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredAuthSession | null>(null);
   const [isGuest, setIsGuest] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const sessionRef = useRef<StoredAuthSession | null>(null);
+  sessionRef.current = session;
 
   useEffect(() => {
     void (async () => {
@@ -201,18 +206,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [applyAuthResponse]);
 
   const getAccessToken = useCallback(async (): Promise<string | null> => {
-    if (!session) {
+    const current = sessionRef.current;
+    if (!current) {
       return null;
     }
 
-    if (!isAccessTokenExpired(session.expiresAt)) {
-      return session.accessToken;
+    if (!isAccessTokenExpired(current.expiresAt)) {
+      return current.accessToken;
     }
 
     try {
-      const tokens = await authClient.refresh(session.refreshToken);
+      const tokens = await authClient.refresh(current.refreshToken);
       const nextSession = await saveAuthSession(
-        session.user,
+        current.user,
         tokens.access_token,
         tokens.refresh_token,
         tokens.expires_in
@@ -224,7 +230,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       return null;
     }
-  }, [session]);
+  }, []);
+
+  const syncSessionMeta = useCallback(async () => {
+    const current = sessionRef.current;
+    if (!current?.refreshToken) {
+      return;
+    }
+    try {
+      const tokens = await authClient.refresh(current.refreshToken);
+      const nextSession = await saveAuthSession(
+        current.user,
+        tokens.access_token,
+        tokens.refresh_token,
+        tokens.expires_in
+      );
+      setSession(nextSession);
+    } catch {
+      // Non-fatal: device list can still load with existing session metadata.
+    }
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -243,6 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       enterGuestMode,
       getAccessToken,
+      syncSessionMeta,
     }),
     [
       session,
@@ -257,6 +283,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       enterGuestMode,
       getAccessToken,
+      syncSessionMeta,
     ]
   );
 

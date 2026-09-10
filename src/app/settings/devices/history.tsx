@@ -2,7 +2,6 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -12,6 +11,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/ThemedText";
+import { AppIcon } from "@/components/ui/AppIcon";
 import { useAuth } from "@/context/AuthContext";
 import { useT } from "@/context/LanguageContext";
 import { useAppTheme } from "@/hooks/useAppTheme";
@@ -196,15 +196,22 @@ export default function DeviceHistoryScreen() {
                       },
                     ]}
                   >
-                    <Image
-                      source={resolveDeviceArtwork({
-                        name: item.device,
-                        system: "",
-                        kind,
-                      })}
-                      style={styles.icon}
-                      accessibilityIgnoresInvertColors
-                    />
+                    <View
+                      style={[
+                        styles.iconWrap,
+                        { backgroundColor: theme.background, borderColor: theme.border },
+                      ]}
+                    >
+                      <AppIcon
+                        icon={resolveDeviceArtwork({
+                          name: item.device,
+                          system: "",
+                          kind,
+                        })}
+                        size={20}
+                        color={theme.text}
+                      />
+                    </View>
                     <View style={styles.rowBody}>
                       <ThemedText type="defaultSemiBold" numberOfLines={1}>
                         {item.device}
@@ -269,10 +276,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 72,
   },
-  icon: {
+  iconWrap: {
     width: 36,
     height: 36,
-    borderRadius: 8,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: "center",
+    justifyContent: "center",
   },
   rowBody: {
     flex: 1,
