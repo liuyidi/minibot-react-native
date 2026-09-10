@@ -2,7 +2,7 @@
   "expo": {
     "name": "Minibot",
     "slug": "minibot",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "minibot",
@@ -10,7 +10,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.liuyidi.minibot",
-      "buildNumber": "9",
+      "buildNumber": "10",
       "infoPlist": {
         "CFBundleDisplayName": "Minibot",
         "ITSAppUsesNonExemptEncryption": false,
@@ -21,7 +21,7 @@
     },
     "android": {
       "package": "com.liuyidi.minibot",
-      "versionCode": 9,
+      "versionCode": 10,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
