@@ -61,6 +61,7 @@ export type MessageCatalog = {
     appearance: string;
     language: string;
     account: string;
+    devices: string;
     about: string;
     logout: string;
     logoutConfirmTitle: string;
@@ -83,9 +84,32 @@ export type MessageCatalog = {
     appearance: string;
     language: string;
     account: string;
+    devices: string;
+    deviceDetail: string;
+    deviceHistory: string;
     server: string;
     about: string;
     aboutApp: string;
+  };
+  devices: {
+    onlineCount: string;
+    usageRecords: string;
+    currentBadge: string;
+    empty: string;
+    loadFailed: string;
+    retry: string;
+    lastSeen: string;
+    loginMethod: string;
+    ip: string;
+    revoke: string;
+    revokeConfirmTitle: string;
+    revokeConfirmMessage: string;
+    revokeFailed: string;
+    cannotRevokeCurrent: string;
+    deviceMissing: string;
+    today: string;
+    statusActive: string;
+    statusRevoked: string;
   };
   chat: {
     welcome: string;
@@ -332,6 +356,7 @@ export const zh: MessageCatalog = {
     appearance: "外观",
     language: "语言",
     account: "账号",
+    devices: "设备管理",
     about: "关于 Minibot",
     logout: "退出登录",
     logoutConfirmTitle: "退出登录",
@@ -354,9 +379,32 @@ export const zh: MessageCatalog = {
     appearance: "外观",
     language: "语言",
     account: "账号管理",
+    devices: "设备管理",
+    deviceDetail: "登录设备详情",
+    deviceHistory: "最近使用记录",
     server: "Minibot 服务器",
     about: "关于",
     aboutApp: "关于 Minibot",
+  },
+  devices: {
+    onlineCount: "客户端在线设备 ({count})",
+    usageRecords: "使用记录",
+    currentBadge: "当前设备",
+    empty: "暂无在线设备",
+    loadFailed: "加载失败，请稍后重试",
+    retry: "重试",
+    lastSeen: "最近使用",
+    loginMethod: "登录方式",
+    ip: "IP",
+    revoke: "退出该设备",
+    revokeConfirmTitle: "退出该设备？",
+    revokeConfirmMessage: "退出后该设备需要重新登录。",
+    revokeFailed: "退出失败，请稍后重试",
+    cannotRevokeCurrent: "不能退出当前设备",
+    deviceMissing: "该设备已下线或不存在",
+    today: "今天",
+    statusActive: "设备活跃",
+    statusRevoked: "已退出",
   },
   chat: {
     welcome: "输入你的问题，或分享你想聊的话题…",
@@ -604,6 +652,7 @@ export const en: MessageCatalog = {
     appearance: "Appearance",
     language: "Language",
     account: "Account",
+    devices: "Devices",
     about: "About Minibot",
     logout: "Sign out",
     logoutConfirmTitle: "Sign out",
@@ -626,9 +675,32 @@ export const en: MessageCatalog = {
     appearance: "Appearance",
     language: "Language",
     account: "Account",
+    devices: "Devices",
+    deviceDetail: "Device details",
+    deviceHistory: "Recent activity",
     server: "Minibot server",
     about: "About",
     aboutApp: "About Minibot",
+  },
+  devices: {
+    onlineCount: "Online devices ({count})",
+    usageRecords: "Usage history",
+    currentBadge: "This device",
+    empty: "No online devices",
+    loadFailed: "Failed to load. Please try again.",
+    retry: "Retry",
+    lastSeen: "Last active",
+    loginMethod: "Sign-in method",
+    ip: "IP",
+    revoke: "Sign out this device",
+    revokeConfirmTitle: "Sign out this device?",
+    revokeConfirmMessage: "The device will need to sign in again.",
+    revokeFailed: "Could not sign out. Please try again.",
+    cannotRevokeCurrent: "You cannot sign out the current device",
+    deviceMissing: "This device is offline or no longer available",
+    today: "Today",
+    statusActive: "Active",
+    statusRevoked: "Signed out",
   },
   chat: {
     welcome: "Ask a question, or share what you'd like to talk about…",

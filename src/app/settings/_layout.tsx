@@ -45,6 +45,15 @@ export default function SettingsLayout() {
       />
       <Stack.Screen name="language" options={{ title: t("settingsTitles.language") }} />
       <Stack.Screen name="account" options={{ title: t("settingsTitles.account") }} />
+      <Stack.Screen name="devices/index" options={{ title: t("settingsTitles.devices") }} />
+      <Stack.Screen
+        name="devices/[id]"
+        options={{ title: t("settingsTitles.deviceDetail") }}
+      />
+      <Stack.Screen
+        name="devices/history"
+        options={{ title: t("settingsTitles.deviceHistory") }}
+      />
       <Stack.Screen name="server" options={{ title: t("settingsTitles.server") }} />
       <Stack.Screen name="about" options={{ title: t("settingsTitles.about") }} />
 

@@ -4,6 +4,7 @@ import {
   Info,
   Languages,
   Palette,
+  Smartphone,
   SwatchBook,
 } from "lucide-react-native";
 import { router, useFocusEffect } from "expo-router";
@@ -239,8 +240,13 @@ export default function SettingsHubScreen() {
             title={t("me.account")}
             value={accountHubValue}
             icon={CircleUser}
-            showDivider={false}
             onPress={() => router.push("/settings/account")}
+          />
+          <SettingsNavRow
+            title={t("me.devices")}
+            icon={Smartphone}
+            showDivider={false}
+            onPress={() => router.push("/settings/devices")}
           />
         </SettingsGroup>
 
