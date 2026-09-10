@@ -23,9 +23,5 @@ config.resolver.extraNodeModules = {
   "react-native": path.resolve(__dirname, "node_modules/react-native"),
 };
 
-module.exports = withStorybook(config, {
-  // Avoid full @storybook/react-native-ui (gorhom) when using ui-lite;
-  // also reduces New-Arch / MessageQueue init surface during Storybook boot.
-  liteMode: true,
-});
+module.exports = withStorybook(config);
 
