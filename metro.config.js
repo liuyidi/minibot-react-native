@@ -2,6 +2,10 @@
  * Metro — default Expo config.
  * Private packages resolve from node_modules (GitHub Packages alias).
  */
+const {
+  withStorybook,
+} = require('@storybook/react-native/withStorybook');
+
 const path = require("node:path");
 const { getDefaultConfig } = require("expo/metro-config");
 
@@ -19,4 +23,4 @@ config.resolver.extraNodeModules = {
   "react-native": path.resolve(__dirname, "node_modules/react-native"),
 };
 
-module.exports = config;
+module.exports = withStorybook(config);

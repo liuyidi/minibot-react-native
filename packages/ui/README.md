@@ -1,34 +1,48 @@
-# @minibot/ui — incubating Mini React Native kit (Direction 02)
+# @minibot/ui — Mini React Native kit
 
-Consumed by the Expo app via `"@minibot/ui": "file:./packages/ui"`.
+Consumed by the Expo app via `"@minibot/ui": "file:./packages/ui"`.  
 Token SoT: [mini-design-system](https://github.com/liuyidi/mini-design-system).
-Web analog: `@minikb/ui` in `minikb/packages/ui`.
 
 ## Policy
 
 - **Create-first, replace-later** — new screens import from here; do not mass-migrate `src/components` yet.
-- No Expo Router, Gateway, or auth dependencies.
-- Colors come from a `palette` prop (or a future ThemeProvider), not hardcoded brand hex in components.
-- **Chat (planned):** mirror `@minikb/chat` prop contracts and `ChatAttachment` types from
-  `minikb/packages/chat/types`. Web implementation lives in `@minikb/chat`; RN primitives will
-  land here as `AttachmentCard`, `ChatSender`, etc.
+- No Expo Router, Gateway, auth, or lucide — icons via `ReactNode` slots.
+- Colors from **`ThemeProvider`** (`useUiTheme` / `useResolvedTheme`); optional per-component `theme` override.
+- **Chat / devices domain (§7–§8)** deferred.
 
-## Usage
+## Theme
 
 ```tsx
-import { Button, TextField } from "@minibot/ui";
+import { ThemeProvider, Button, brandLight } from "@minibot/ui";
 
-<Button
-  label="Continue"
-  variant="primary"
-  palette={{ primary: "#080808", onPrimary: "#ffffff", surface: "#f5f5f5", text: "#080808", border: "#dedede" }}
-  onPress={() => {}}
-/>
-
-<TextField
-  label="Email"
-  palette={{ ink: "#080808", canvas: "#ffffff", border: "#a8a8a8", focus: "#4f46e5", muted: "#666666" }}
-  value={email}
-  onChangeText={setEmail}
-/>
+<ThemeProvider theme={brandLight}>
+  <Button label="Continue" onPress={() => {}} />
+</ThemeProvider>
 ```
+
+App wires `AppearanceProvider` → `toUiTheme(palette)` → kit `ThemeProvider` in `src/app/_layout.tsx`.
+
+## Storybook (entry swap)
+
+```bash
+npm run storybook          # STORYBOOK_ENABLED=true expo start
+npm run storybook:ios
+npm run storybook:android
+```
+
+When `STORYBOOK_ENABLED` is unset, the normal app entry runs and Storybook is stripped.  
+Preview toolbar toggles brand light / dark.
+
+## Inventory (§1–§6)
+
+| Section | Components |
+|---------|------------|
+| Theme | ThemeProvider, useUiTheme, useResolvedTheme, brandLight/Dark |
+| Foundation | Text, Button, IconButton, TextField, TextArea, Card, Divider, Spinner, Skeleton, Badge, Avatar, Chip |
+| Controls | Switch, Checkbox, Radio/RadioGroup, SegmentedControl, Slider, ProgressBar |
+| Lists | ListGroup, ListRow, SearchBar, EmptyState, Tabs |
+| Overlays | Backdrop, Dialog, **BottomSheet**, ActionSheet, ToastProvider/useToast, Banner |
+| Forms | FormField, OTPInput, PasswordField, PickerRow |
+| Chrome | Screen, StackHeader, FAB |
+
+Deferred: ChatBubble, ChatComposer, ApprovalCard, DeviceRow, SessionRow, …
