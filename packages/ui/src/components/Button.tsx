@@ -8,14 +8,16 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import type { ButtonPalette } from "../theme/types";
+import { useResolvedTheme } from "../theme/ThemeProvider";
+import type { UiTheme } from "../theme/types";
 
-export type ButtonVariant = "primary" | "secondary";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
 
 export type ButtonProps = Omit<PressableProps, "children" | "style"> & {
   label: string;
   variant?: ButtonVariant;
-  palette: ButtonPalette;
+  /** Partial theme override (escape hatch). */
+  theme?: Partial<UiTheme>;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -23,16 +25,40 @@ export type ButtonProps = Omit<PressableProps, "children" | "style"> & {
 export function Button({
   label,
   variant = "primary",
-  palette,
+  theme: themeOverride,
   loading = false,
   disabled,
   style,
   ...rest
 }: ButtonProps) {
-  const isPrimary = variant === "primary";
-  const bg = isPrimary ? palette.primary : palette.surface;
-  const fg = isPrimary ? palette.onPrimary : palette.text;
-  const borderColor = isPrimary ? palette.primary : palette.border;
+  const palette = useResolvedTheme(themeOverride);
+
+  let bg: string = "transparent";
+  let fg: string = palette.text;
+  let borderColor: string = "transparent";
+
+  switch (variant) {
+    case "primary":
+      bg = palette.primary;
+      fg = palette.onPrimary;
+      borderColor = palette.primary;
+      break;
+    case "secondary":
+      bg = palette.surface;
+      fg = palette.text;
+      borderColor = palette.border;
+      break;
+    case "ghost":
+      bg = "transparent";
+      fg = palette.text;
+      borderColor = "transparent";
+      break;
+    case "destructive":
+      bg = palette.red;
+      fg = "#ffffff";
+      borderColor = palette.red;
+      break;
+  }
 
   return (
     <Pressable

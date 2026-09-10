@@ -9,17 +9,21 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
+import { ThemeProvider as UiThemeProvider } from "@minibot/ui";
+
 import { AppearanceProvider, useAppearance } from '@/context/AppearanceContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { MinibotProvider } from '@/context/MinibotClientContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { toUiTheme } from "@/lib/theme/toUiTheme";
 
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { palette } = useAppearance();
+  const uiTheme = useMemo(() => toUiTheme(palette), [palette]);
   const navTheme = useMemo(() => {
     const dark = colorScheme === 'dark';
     const base = dark ? DarkTheme : DefaultTheme;
@@ -38,19 +42,21 @@ function RootLayoutNav() {
   }, [colorScheme, palette]);
 
   return (
-    <ThemeProvider value={navTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="settings"
-          options={{ headerShown: false, animation: 'slide_from_right' }}
-        />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-    </ThemeProvider>
+    <UiThemeProvider theme={uiTheme}>
+      <ThemeProvider value={navTheme}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="settings"
+            options={{ headerShown: false, animation: 'slide_from_right' }}
+          />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      </ThemeProvider>
+    </UiThemeProvider>
   );
 }
 

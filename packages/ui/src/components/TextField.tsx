@@ -8,35 +8,35 @@ import {
   type ViewStyle,
 } from "react-native";
 
-export type TextFieldPalette = {
-  ink: string;
-  canvas: string;
-  border: string;
-  focus: string;
-  muted: string;
-};
+import { useResolvedTheme } from "../theme/ThemeProvider";
+import type { UiTheme } from "../theme/types";
 
 export type TextFieldProps = TextInputProps & {
   label?: string;
   hint?: string;
-  palette: TextFieldPalette;
+  error?: string;
+  theme?: Partial<UiTheme>;
   containerStyle?: StyleProp<ViewStyle>;
 };
 
 export function TextField({
   label,
   hint,
-  palette,
+  error,
+  theme: themeOverride,
   containerStyle,
   style,
   ...rest
 }: TextFieldProps) {
+  const palette = useResolvedTheme(themeOverride);
+  const borderColor = error ? palette.red : palette.border;
+
   return (
     <View style={[styles.field, containerStyle]}>
       {label ? (
-        <Text style={[styles.label, { color: palette.ink }]}>{label}</Text>
+        <Text style={[styles.label, { color: palette.heading }]}>{label}</Text>
       ) : null}
-      {hint ? (
+      {hint && !error ? (
         <Text style={[styles.hint, { color: palette.muted }]}>{hint}</Text>
       ) : null}
       <TextInput
@@ -44,33 +44,40 @@ export function TextField({
         style={[
           styles.input,
           {
-            color: palette.ink,
-            backgroundColor: palette.canvas,
-            borderColor: palette.border,
+            color: palette.text,
+            backgroundColor: palette.background,
+            borderColor,
           },
           style,
         ]}
         {...rest}
       />
+      {error ? (
+        <Text style={[styles.error, { color: palette.red }]}>{error}</Text>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   field: {
-    gap: 12,
+    gap: 8,
   },
   label: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "500",
-    lineHeight: 18,
+    lineHeight: 20,
     textAlign: "left",
   },
   hint: {
     fontSize: 14,
-    fontWeight: "300",
+    fontWeight: "400",
     lineHeight: 18,
     textAlign: "left",
+  },
+  error: {
+    fontSize: 13,
+    lineHeight: 18,
   },
   input: {
     minHeight: 48,

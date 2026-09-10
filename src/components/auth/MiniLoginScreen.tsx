@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
-import { Button, TextField } from "@minibot/ui";
+import { Button, TextField, ThemeProvider, brandLight } from "@minibot/ui";
 
 import { useLanguage } from "@/context/LanguageContext";
 import type { AppLanguage } from "@/lib/i18n/languageConfig";
@@ -30,22 +30,6 @@ const colors = {
   danger: "#b42318",
   dangerSurface: "#fff1f0",
   support: "#333333",
-};
-
-const buttonPalette = {
-  primary: colors.ink,
-  onPrimary: colors.canvas,
-  surface: colors.surface,
-  text: colors.ink,
-  border: colors.border,
-};
-
-const fieldPalette = {
-  ink: colors.ink,
-  canvas: colors.canvas,
-  border: colors.border,
-  focus: colors.focus,
-  muted: colors.muted,
 };
 
 type MiniLoginScreenProps = {
@@ -372,6 +356,7 @@ export function MiniLoginScreen({
   };
 
   return (
+    <ThemeProvider theme={brandLight}>
     <KeyboardAvoidingView
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -459,7 +444,6 @@ export function MiniLoginScreen({
             {isRegister ? (
               <TextField
                 label={copy.username}
-                palette={fieldPalette}
                 containerStyle={styles.field}
                 value={username}
                 onChangeText={setUsername}
@@ -472,7 +456,6 @@ export function MiniLoginScreen({
 
             <TextField
               label={copy.email}
-              palette={fieldPalette}
               containerStyle={styles.field}
               value={email}
               onChangeText={setEmail}
@@ -488,7 +471,6 @@ export function MiniLoginScreen({
             {sentEmail ? (
               <TextField
                 hint={copy.codeSentTo(sentEmail)}
-                palette={fieldPalette}
                 containerStyle={styles.field}
                 value={code}
                 onChangeText={setCode}
@@ -501,7 +483,6 @@ export function MiniLoginScreen({
 
             <Button
               label={actionLabel}
-              palette={buttonPalette}
               loading={isBusy}
               disabled={isBusy}
               onPress={() => void submit()}
@@ -601,6 +582,7 @@ export function MiniLoginScreen({
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </ThemeProvider>
   );
 }
 
