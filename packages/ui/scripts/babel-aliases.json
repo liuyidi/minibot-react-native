@@ -1,0 +1,214 @@
+{
+  "theme-provider": {
+    "short": "theme",
+    "symbol": "ThemeProvider"
+  },
+  "use-ui-theme": {
+    "short": "theme",
+    "symbol": "useUiTheme"
+  },
+  "use-resolved-theme": {
+    "short": "theme",
+    "symbol": "useResolvedTheme"
+  },
+  "brand-dark": {
+    "short": "theme",
+    "symbol": "brandDark"
+  },
+  "brand-light": {
+    "short": "theme",
+    "symbol": "brandLight"
+  },
+  "config-provider": {
+    "short": "config",
+    "symbol": "ConfigProvider"
+  },
+  "use-config": {
+    "short": "config",
+    "symbol": "useConfig"
+  },
+  "use-ui-locale": {
+    "short": "config",
+    "symbol": "useUiLocale"
+  },
+  "use-ui-messages": {
+    "short": "config",
+    "symbol": "useUiMessages"
+  },
+  "locale-messages": {
+    "short": "config",
+    "symbol": "localeMessages"
+  },
+  "radio-group": {
+    "short": "radio",
+    "symbol": "RadioGroup"
+  },
+  "picker-row": {
+    "short": "picker",
+    "symbol": "PickerRow"
+  },
+  "picker-column": {
+    "short": "picker",
+    "symbol": "PickerColumn"
+  },
+  "picker-view": {
+    "short": "picker",
+    "symbol": "PickerView"
+  },
+  "picker-group": {
+    "short": "picker",
+    "symbol": "PickerGroup"
+  },
+  "time-picker-view": {
+    "short": "time-picker",
+    "symbol": "TimePickerView"
+  },
+  "date-picker-view": {
+    "short": "date-picker",
+    "symbol": "DatePickerView"
+  },
+  "date-time-picker": {
+    "short": "date-picker",
+    "symbol": "DateTimePicker"
+  },
+  "date-time-picker-view": {
+    "short": "date-picker",
+    "symbol": "DateTimePickerView"
+  },
+  "calendar-grid": {
+    "short": "calendar-picker",
+    "symbol": "CalendarGrid"
+  },
+  "calendar-picker-view": {
+    "short": "calendar-picker",
+    "symbol": "CalendarPickerView"
+  },
+  "calendar-range-with-time": {
+    "short": "calendar-picker",
+    "symbol": "CalendarRangeWithTime"
+  },
+  "calendar-range-with-time-view": {
+    "short": "calendar-picker",
+    "symbol": "CalendarRangeWithTimeView"
+  },
+  "parse-date": {
+    "short": "date",
+    "symbol": "parseDate"
+  },
+  "parse-time": {
+    "short": "date",
+    "symbol": "parseTime"
+  },
+  "parse-date-time": {
+    "short": "date",
+    "symbol": "parseDateTime"
+  },
+  "format-date": {
+    "short": "date",
+    "symbol": "formatDate"
+  },
+  "format-time": {
+    "short": "date",
+    "symbol": "formatTime"
+  },
+  "format-date-time": {
+    "short": "date",
+    "symbol": "formatDateTime"
+  },
+  "format-month-day": {
+    "short": "date",
+    "symbol": "formatMonthDay"
+  },
+  "start-of-day": {
+    "short": "date",
+    "symbol": "startOfDay"
+  },
+  "add-days": {
+    "short": "date",
+    "symbol": "addDays"
+  },
+  "add-months": {
+    "short": "date",
+    "symbol": "addMonths"
+  },
+  "night-count": {
+    "short": "date",
+    "symbol": "nightCount"
+  },
+  "duration-label": {
+    "short": "date",
+    "symbol": "durationLabel"
+  },
+  "cn-holidays2025": {
+    "short": "date",
+    "symbol": "cnHolidays2025"
+  },
+  "cn-holidays2026": {
+    "short": "date",
+    "symbol": "cnHolidays2026"
+  },
+  "set-holiday-overrides": {
+    "short": "date",
+    "symbol": "setHolidayOverrides"
+  },
+  "clear-holiday-overrides": {
+    "short": "date",
+    "symbol": "clearHolidayOverrides"
+  },
+  "get-day-holiday-meta": {
+    "short": "date",
+    "symbol": "getDayHolidayMeta"
+  },
+  "resolve-day-holiday-meta": {
+    "short": "date",
+    "symbol": "resolveDayHolidayMeta"
+  },
+  "use-pull-refresh-control": {
+    "short": "pull-refresh",
+    "symbol": "usePullRefreshControl"
+  },
+  "toast-provider": {
+    "short": "toast",
+    "symbol": "ToastProvider"
+  },
+  "toast-host": {
+    "short": "toast",
+    "symbol": "ToastHost"
+  },
+  "use-toast": {
+    "short": "toast",
+    "symbol": "useToast"
+  },
+  "alert": {
+    "short": "dialog",
+    "symbol": "Alert"
+  },
+  "confirm": {
+    "short": "dialog",
+    "symbol": "Confirm"
+  },
+  "dialog-provider": {
+    "short": "dialog",
+    "symbol": "DialogProvider"
+  },
+  "use-dialog": {
+    "short": "dialog",
+    "symbol": "useDialog"
+  },
+  "overlay-stack": {
+    "short": "overlay",
+    "symbol": "OverlayStack"
+  },
+  "overlay-portal": {
+    "short": "overlay",
+    "symbol": "OverlayPortal"
+  },
+  "overlay-levels": {
+    "short": "overlay",
+    "symbol": "OverlayLevels"
+  },
+  "tooltip": {
+    "short": "popover",
+    "symbol": "Tooltip"
+  }
+}
