@@ -104,8 +104,15 @@ export { OTPInput } from "./components/forms/otp-input";
 export type { OTPInputProps } from "./components/forms/otp-input";
 export { Uploader } from "./components/forms/uploader";
 export type { UploaderProps, UploaderFile } from "./components/forms/uploader";
-export { FormField } from "./components/forms/form-field";
-export type { FormFieldProps } from "./components/forms/form-field";
+export { Form, useForm } from "./components/forms/form";
+export type {
+  FormProps,
+  FormInstance,
+  FormItemProps,
+  FormHeaderProps,
+  FormLayout,
+  Rule,
+} from "./components/forms/form";
 export { SearchBar } from "./components/forms/search-bar";
 export type {
   SearchBarProps,

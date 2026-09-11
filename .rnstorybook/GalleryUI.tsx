@@ -82,7 +82,7 @@ const COMPONENT_ZH: Record<string, string> = {
   TextArea: "多行输入",
   PasswordField: "密码输入",
   OTPInput: "验证码输入",
-  FormField: "表单项",
+  Form: "表单",
   SearchBar: "搜索栏",
   Picker: "选择器",
   PickerRow: "选择行",

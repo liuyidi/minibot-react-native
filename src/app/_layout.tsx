@@ -9,11 +9,11 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
-import { ThemeProvider as UiThemeProvider } from "@minibot/ui";
+import { ConfigProvider } from "@minibot/ui";
 
 import { AppearanceProvider, useAppearance } from '@/context/AppearanceContext';
 import { AuthProvider } from '@/context/AuthContext';
-import { LanguageProvider } from '@/context/LanguageContext';
+import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import { MinibotProvider } from '@/context/MinibotClientContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { toUiTheme } from "@/lib/theme/toUiTheme";
@@ -23,7 +23,10 @@ SplashScreen.preventAutoHideAsync();
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { palette } = useAppearance();
+  const { language } = useLanguage();
   const uiTheme = useMemo(() => toUiTheme(palette), [palette]);
+  const uiLocale = language === "en" ? "en" : "zh";
+  const uiMode = colorScheme === "dark" ? "dark" : "light";
   const navTheme = useMemo(() => {
     const dark = colorScheme === 'dark';
     const base = dark ? DarkTheme : DefaultTheme;
@@ -42,7 +45,7 @@ function RootLayoutNav() {
   }, [colorScheme, palette]);
 
   return (
-    <UiThemeProvider theme={uiTheme}>
+    <ConfigProvider theme={uiTheme} locale={uiLocale} mode={uiMode}>
       <ThemeProvider value={navTheme}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -56,7 +59,7 @@ function RootLayoutNav() {
         </Stack>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       </ThemeProvider>
-    </UiThemeProvider>
+    </ConfigProvider>
   );
 }
 

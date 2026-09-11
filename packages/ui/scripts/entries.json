@@ -24,7 +24,7 @@
   "toast/index": "src/components/feedback/toast/index.ts",
   "calendar-picker/index": "src/components/forms/calendar-picker/index.ts",
   "date-picker/index": "src/components/forms/date-picker/index.ts",
-  "form-field/index": "src/components/forms/form-field/index.ts",
+  "form/index": "src/components/forms/form/index.ts",
   "otp-input/index": "src/components/forms/otp-input/index.ts",
   "password-field/index": "src/components/forms/password-field/index.ts",
   "picker/index": "src/components/forms/picker/index.ts",

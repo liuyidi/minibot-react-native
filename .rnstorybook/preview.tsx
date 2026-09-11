@@ -1,7 +1,9 @@
 import type { Preview } from "@storybook/react-native";
 import { View, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { ThemeProvider, brandDark, brandLight } from "@minibot/ui";
+import { ConfigProvider, brandDark, brandLight } from "@minibot/ui";
 
 const preview: Preview = {
   globalTypes: {
@@ -23,16 +25,20 @@ const preview: Preview = {
       const mode = (context.globals.theme as string) === "dark" ? "dark" : "light";
       const theme = mode === "dark" ? brandDark : brandLight;
       return (
-        <ThemeProvider theme={theme}>
-          <View
-            style={[
-              styles.wrap,
-              { backgroundColor: theme.background },
-            ]}
-          >
-            <Story />
-          </View>
-        </ThemeProvider>
+        <GestureHandlerRootView style={styles.root}>
+          <SafeAreaProvider>
+            <ConfigProvider theme={theme} mode={mode} locale="zh">
+              <View
+                style={[
+                  styles.wrap,
+                  { backgroundColor: theme.background },
+                ]}
+              >
+                <Story />
+              </View>
+            </ConfigProvider>
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
       );
     },
   ],
@@ -49,8 +55,12 @@ const preview: Preview = {
 export default preview;
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   wrap: {
     flex: 1,
+    // Story canvas padding only — gallery home is outside this decorator.
     padding: 16,
   },
 });

@@ -43,6 +43,10 @@
     "short": "radio",
     "symbol": "RadioGroup"
   },
+  "use-form": {
+    "short": "form",
+    "symbol": "useForm"
+  },
   "picker-row": {
     "short": "picker",
     "symbol": "PickerRow"

@@ -1,21 +1,9 @@
 /**
  * Storybook entry (swapped in when STORYBOOK_ENABLED=true).
- * gesture-handler / reanimated MUST load before Storybook UI / bottom-sheet.
+ *
+ * Keep this as `index.ts` — @storybook/react-native resolves
+ * `.rnstorybook/index` with extensions `js → jsx → ts → tsx`, so `.ts`
+ * must exist or a stale Metro graph still pointing at `index.ts` will
+ * throw "Failed to get the SHA-1".
  */
-import "react-native-gesture-handler";
-import "react-native-reanimated";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { registerRootComponent } from "expo";
-
-import { view } from "./storybook.requires";
-
-const StorybookUIRoot = view.getStorybookUI({
-  shouldPersistSelection: true,
-  storage: {
-    getItem: AsyncStorage.getItem,
-    setItem: AsyncStorage.setItem,
-  },
-});
-
-registerRootComponent(StorybookUIRoot);
+import "./entry";

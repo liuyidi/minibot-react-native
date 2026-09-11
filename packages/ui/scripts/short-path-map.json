@@ -23,7 +23,7 @@
   "toast": "./src/components/feedback/toast/index.ts",
   "calendar-picker": "./src/components/forms/calendar-picker/index.ts",
   "date-picker": "./src/components/forms/date-picker/index.ts",
-  "form-field": "./src/components/forms/form-field/index.ts",
+  "form": "./src/components/forms/form/index.ts",
   "otp-input": "./src/components/forms/otp-input/index.ts",
   "password-field": "./src/components/forms/password-field/index.ts",
   "picker": "./src/components/forms/picker/index.ts",

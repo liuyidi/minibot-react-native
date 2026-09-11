@@ -4,9 +4,7 @@
     "strict": true,
     "types": ["jest"],
     "paths": {
-      "@/*": ["./src/*"],
-      "@minibot/ui": ["./packages/ui/src/index.ts"],
-      "@minibot/ui/*": ["./packages/ui/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

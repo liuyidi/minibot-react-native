@@ -65,5 +65,8 @@
     "src",
     "package.json",
     "README.md"
-  ]
+  ],
+  "dependencies": {
+    "rc-field-form": "^2.7.1"
+  }
 }

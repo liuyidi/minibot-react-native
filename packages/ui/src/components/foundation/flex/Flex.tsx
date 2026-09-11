@@ -6,6 +6,8 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import { withStatics } from "../../../utils/withStatics";
+
 export type FlexDirection = "horizontal" | "vertical";
 export type FlexAlign = "start" | "center" | "end" | "stretch" | "baseline";
 export type FlexJustify =
@@ -123,4 +125,4 @@ function FlexItem({ children, flex = 1, style }: FlexItemProps) {
 }
 
 /** Fixed edges + flexible center. Pair with `Flex.Item` for the growing slot. */
-export const Flex = Object.assign(FlexRoot, { Item: FlexItem });
+export const Flex = withStatics(FlexRoot, { Item: FlexItem });

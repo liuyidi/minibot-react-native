@@ -482,12 +482,13 @@ export function MiniLoginScreen({
             ) : null}
 
             <Button
-              label={actionLabel}
               loading={isBusy}
               disabled={isBusy}
               onPress={() => void submit()}
               style={styles.continueBtn}
-            />
+            >
+              {actionLabel}
+            </Button>
           </View>
 
           <View style={styles.support}>
