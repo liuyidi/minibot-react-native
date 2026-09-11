@@ -15,6 +15,7 @@ import { ConfigContext } from "../config/context";
 import { ThemeProvider } from "../theme/ThemeProvider";
 import { getOverlayBridge, subscribeOverlayBridge } from "./bridge";
 import { OverlayStack } from "./controller";
+import { InsideOverlayHostContext } from "./insideHost";
 import type { OverlayStackItem } from "./types";
 
 function useOverlaySnapshot(): OverlayStackItem[] {
@@ -70,7 +71,9 @@ function OverlayLayer({
         />
       ) : null}
       <View style={styles.fill} pointerEvents="box-none">
-        {node}
+        <InsideOverlayHostContext.Provider value={true}>
+          {node}
+        </InsideOverlayHostContext.Provider>
       </View>
     </View>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 
 import { OverlayStack } from "./controller";
+import { useInsideOverlayHost } from "./insideHost";
 import type { OverlayOptions } from "./types";
 
 export type OverlayPortalProps = {
@@ -23,6 +24,9 @@ export type OverlayPortalProps = {
  * When the portal's parent re-renders (e.g. calendar draft state), we
  * `notify()` the host so it re-reads the getter — without replacing the
  * getter reference (that used to loop with `update` + new element trees).
+ *
+ * When this portal is itself rendered inside OverlayHost (imperative
+ * Dialog.alert → Alert → Popup), paint children inline and skip show/notify.
  */
 export function OverlayPortal({
   visible,
@@ -30,6 +34,7 @@ export function OverlayPortal({
   options,
   onDismiss,
 }: OverlayPortalProps) {
+  const insideHost = useInsideOverlayHost();
   const idRef = useRef<string | null>(null);
   const closingFromProp = useRef(false);
   const contentRef = useRef(children);
@@ -42,10 +47,13 @@ export function OverlayPortal({
 
   // Keep OverlayHost in sync when portal children change (selection, form draft…).
   useLayoutEffect(() => {
+    if (insideHost) return;
     if (idRef.current) OverlayStack.notify();
   });
 
   useEffect(() => {
+    if (insideHost) return;
+
     if (!visible) {
       if (idRef.current) {
         closingFromProp.current = true;
@@ -78,7 +86,11 @@ export function OverlayPortal({
         idRef.current = null;
       }
     };
-  }, [visible]);
+  }, [visible, insideHost]);
+
+  if (insideHost) {
+    return visible ? <>{children}</> : null;
+  }
 
   return null;
 }
