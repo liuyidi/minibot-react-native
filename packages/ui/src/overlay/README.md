@@ -176,18 +176,28 @@ Storybook **OverlayStack → 嵌套叠层** 可点验。
 ### 4.1 Toast：请求反馈
 
 ```tsx
-import { Toast, useToast, Button } from "@minibot/ui";
+import { Toast, useToast, Button, OverlayStack } from "@minibot/ui";
 
 // 任意处（需已在 ConfigProvider 下）
 async function save() {
-  Toast.loading("保存中...", 0); // 0 = 不自动关
+  Toast.loading("保存中...", 0); // 0 = 不自动关；loading 默认可点穿
   try {
     await api.save();
-    Toast.hide();
-    Toast.success("已保存");
+    Toast.success("已保存"); // 同 id 替换 loading，无需再 hide
   } catch {
-    Toast.hide();
     Toast.fail("保存失败");
+  }
+}
+
+// 中途取消、不弹结果时：
+async function saveOrAbort(signal: AbortSignal) {
+  Toast.loading("保存中...", 0);
+  try {
+    await api.save({ signal });
+    Toast.success("已保存");
+  } catch (e) {
+    Toast.hide();
+    if (!signal.aborted) Toast.fail("保存失败");
   }
 }
 
@@ -198,23 +208,30 @@ function SaveButton() {
     <Button
       onPress={async () => {
         toast.loading("提交中...");
-        await api.submit();
-        toast.success("完成");
+        try {
+          await api.submit();
+          toast.success("完成");
+        } catch {
+          toast.fail("失败");
+        }
       }}
     >
       提交
     </Button>
   );
 }
+
+// 路由离开时清残留（避免 sticky loading / 未关 Sheet 挡住下一页）
+navigation.addListener("blur", () => OverlayStack.dismissAll());
 ```
 
 常用 API：
 
 | 方法 | 用途 |
 |------|------|
-| `Toast.show(msg)` / `show({ message, icon, position, durationMs, maskClickable })` | 通用 |
-| `Toast.loading(msg?, durationMs?)` | 加载；默认约 3s，传 `0` 需 `hide()` |
-| `Toast.success` / `Toast.fail` | 结果 |
+| `Toast.show(msg)` / `show({ message, icon, position, durationMs, maskClickable })` | 通用；`icon: "loading"` 时 `maskClickable` 默认 `true` |
+| `Toast.loading(msg?, durationMs?)` | 加载；默认约 3s，传 `0` 需 `hide()` 或由 success/fail 替换；**默认点穿**，要封锁传 `maskClickable: false` |
+| `Toast.success` / `Toast.fail` | 结果（替换当前 Toast） |
 | `Toast.hide()` | 关掉当前 Toast |
 
 Toast 层级 **高于** Dialog / Popup，可盖在 Sheet、确认框之上。
@@ -280,7 +297,6 @@ async function checkout() {
   Toast.loading("支付中...", 0);
   try {
     await api.pay();
-    Toast.hide();
     Toast.success("支付成功");
   } catch (e) {
     Toast.hide();

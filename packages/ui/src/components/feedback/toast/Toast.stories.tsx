@@ -112,7 +112,6 @@ function ToastDemo() {
                   loading({
                     message: "请耐心等待...",
                     durationMs: 0,
-                    maskClickable: true,
                   })
                 }
               >手动打开</Button>
@@ -210,7 +209,7 @@ function ToastDemo() {
           </Space>
         </DemoBlock>
 
-        <DemoBlock title="背景可点击">
+        <DemoBlock title="背景可点击（loading 默认点穿）">
           <Space wrap block gap={GAP}>
             <Btn>
               <Button
@@ -219,12 +218,11 @@ function ToastDemo() {
                 block
                 onPress={() =>
                   loading({
-                    message: "背景可点穿",
+                    message: "默认可点穿",
                     durationMs: 0,
-                    maskClickable: true,
                   })
                 }
-              >允许点击</Button>
+              >默认点穿</Button>
             </Btn>
             <Btn>
               <Button
@@ -235,6 +233,7 @@ function ToastDemo() {
                 onPress={() =>
                   loading({
                     message: "请耐心等待，不要退出",
+                    durationMs: 0,
                     maskClickable: false,
                   })
                 }

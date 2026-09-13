@@ -24,7 +24,8 @@ export type ToastShowOptions = {
   position?: ToastPosition;
   /**
    * Allow presses to pass through to content behind the toast.
-   * @default false
+   * @default false for show/success/fail; **true for `Toast.loading`**
+   * (sticky loading must not trap the whole UI unless you opt into blocking).
    */
   maskClickable?: boolean;
 };
@@ -75,7 +76,9 @@ function normalizeOptions(
       message: messageOrOptions.message,
       icon,
       position: messageOrOptions.position ?? "center",
-      maskClickable: messageOrOptions.maskClickable ?? false,
+      // Loading toasts default to pass-through so a forgotten hide() cannot brick UI.
+      maskClickable:
+        messageOrOptions.maskClickable ?? (isLoading ? true : false),
     },
     durationMs:
       messageOrOptions.durationMs ??
@@ -116,7 +119,7 @@ const toastApi: ToastApi = {
           message: messageOrOptions,
           icon: "loading",
           position: "center",
-          maskClickable: false,
+          maskClickable: true,
         },
         durationMs ?? 3000,
       );
@@ -127,7 +130,7 @@ const toastApi: ToastApi = {
         message: messageOrOptions.message ?? "加载中...",
         icon: "loading",
         position: messageOrOptions.position ?? "center",
-        maskClickable: messageOrOptions.maskClickable ?? false,
+        maskClickable: messageOrOptions.maskClickable ?? true,
       },
       messageOrOptions.durationMs ?? durationMs ?? 3000,
     );

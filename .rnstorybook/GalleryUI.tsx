@@ -14,6 +14,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
   ConfigProvider,
+  OverlayStack,
   brandDark,
   brandLight,
   type UiLocale,
@@ -291,11 +292,18 @@ export const GalleryStorybookUI: SBUI = ({
 
   const openStory = useCallback(
     (id: string) => {
+      // Drop sticky Toast / leftover sheets from the previous story.
+      OverlayStack.dismissAll();
       setStory(id);
       setBrowsing(false);
     },
     [setStory],
   );
+
+  const backToGallery = useCallback(() => {
+    OverlayStack.dismissAll();
+    setBrowsing(true);
+  }, []);
 
   const componentName =
     story?.title?.split("/").pop() ?? story?.name ?? "Component";
@@ -324,7 +332,7 @@ export const GalleryStorybookUI: SBUI = ({
         >
           <Pressable
             accessibilityRole="button"
-            onPress={() => setBrowsing(true)}
+            onPress={backToGallery}
             hitSlop={8}
             style={({ pressed }) => [
               styles.backBtn,

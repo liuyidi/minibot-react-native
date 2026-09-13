@@ -1,9 +1,47 @@
+import { useEffect, type ComponentType } from "react";
 import type { Preview } from "@storybook/react-native";
 import { View, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { ConfigProvider, brandDark, brandLight } from "@minibot/ui";
+import {
+  ConfigProvider,
+  OverlayStack,
+  brandDark,
+  brandLight,
+} from "@minibot/ui";
+
+/** Clear global overlays whenever the active story changes or unmounts. */
+function StoryCanvas({
+  Story,
+  storyId,
+  mode,
+}: {
+  Story: ComponentType;
+  storyId: string;
+  mode: "light" | "dark";
+}) {
+  useEffect(() => {
+    OverlayStack.dismissAll();
+    return () => OverlayStack.dismissAll();
+  }, [storyId]);
+
+  const theme = mode === "dark" ? brandDark : brandLight;
+
+  return (
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        <ConfigProvider theme={theme} mode={mode} locale="zh">
+          <View
+            style={[styles.wrap, { backgroundColor: theme.background }]}
+          >
+            <Story />
+          </View>
+        </ConfigProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}
 
 const preview: Preview = {
   globalTypes: {
@@ -21,26 +59,15 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story, context) => {
-      const mode = (context.globals.theme as string) === "dark" ? "dark" : "light";
-      const theme = mode === "dark" ? brandDark : brandLight;
-      return (
-        <GestureHandlerRootView style={styles.root}>
-          <SafeAreaProvider>
-            <ConfigProvider theme={theme} mode={mode} locale="zh">
-              <View
-                style={[
-                  styles.wrap,
-                  { backgroundColor: theme.background },
-                ]}
-              >
-                <Story />
-              </View>
-            </ConfigProvider>
-          </SafeAreaProvider>
-        </GestureHandlerRootView>
-      );
-    },
+    (Story, context) => (
+      <StoryCanvas
+        Story={Story}
+        storyId={context.id}
+        mode={
+          (context.globals.theme as string) === "dark" ? "dark" : "light"
+        }
+      />
+    ),
   ],
   parameters: {
     controls: {
